@@ -1,0 +1,57 @@
+@font-face{font-family:'Turbo Weasel Tag';src:url(../assets/fonts/TurboWeaselTag.otf) format('opentype');font-display:block}
+@font-face{font-family:'Turbo Weasel Hand';src:url(../assets/fonts/TurboWeaselHand.otf) format('opentype');font-display:block}
+html,body{margin:0;height:100%;background:#120d0b;overflow:hidden;font-family:'Barlow Condensed','Arial Narrow',sans-serif;color:#f4e6ca;-webkit-user-select:none;user-select:none;touch-action:none}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:
+ radial-gradient(ellipse at 50% 40%,#2a1d16 0%,#120d0b 70%)}
+#game{width:min(100vw,calc(100vh*16/9));height:min(100vh,calc(100vw*9/16));image-rendering:auto;cursor:default;box-shadow:0 0 0 4px #000,0 0 60px #000}
+#halftone{pointer-events:none;position:absolute;inset:0;background-image:radial-gradient(rgba(0,0,0,.18) 1px,transparent 1.4px);background-size:4px 4px;mix-blend-mode:multiply;opacity:.35}
+#touch{position:absolute;inset:0;pointer-events:none}
+#touch[hidden]{display:none}
+#fshelp[hidden]{display:none}
+#fstip[hidden]{display:none}
+#rotate{position:fixed;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#120d0b;color:#f4e6ca;text-align:center;padding:24px}
+#rotate .phone{width:46px;height:84px;border:4px solid #efba56;border-radius:10px;animation:rot 1.6s ease-in-out infinite}
+#rotate h2{font:400 11vmin 'Bangers',sans-serif;color:#efba56;margin:0;letter-spacing:2px}
+#rotate p{font:600 4.6vmin 'Barlow Condensed',sans-serif;margin:0;opacity:.8}
+#rotate small{font:600 3.4vmin 'Barlow Condensed',sans-serif;opacity:.5}
+@keyframes rot{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+body.touch.portrait #rotate{display:flex}
+body.touch.portrait.dismissed #rotate{display:none}
+@media (orientation:landscape){
+ #stick{left:max(4vw,env(safe-area-inset-left));bottom:max(5vh,env(safe-area-inset-bottom))}
+ #btns{right:max(3vw,env(safe-area-inset-right));bottom:max(5vh,env(safe-area-inset-bottom))}
+ #tpause{right:max(3vw,env(safe-area-inset-right));top:max(3vh,env(safe-area-inset-top))}
+ #tback{left:max(4vw,env(safe-area-inset-left));top:max(3vh,env(safe-area-inset-top))}
+}
+@media (orientation:portrait){
+ #stick{width:34vmin;height:34vmin;bottom:8vh}
+ #btns button{width:22vmin;height:22vmin;font-size:3.4vmin}
+ #btns{bottom:8vh}
+}
+#stick{position:absolute;left:4vw;bottom:5vh;width:26vmin;height:26vmin;border-radius:50%;border:3px solid rgba(244,230,202,.5);background:rgba(0,0,0,.25);pointer-events:auto}
+#stick .knob{position:absolute;left:50%;top:50%;width:40%;height:40%;margin:-20% 0 0 -20%;border-radius:50%;background:rgba(244,230,202,.6);border:3px solid #17242b}
+#btns{position:absolute;right:3vw;bottom:5vh;display:flex;gap:2vmin;pointer-events:none}
+#btns button{pointer-events:auto;width:17vmin;height:17vmin;border-radius:50%;border:3px solid #17242b;font:800 2.6vmin 'Barlow Condensed',sans-serif;color:#17242b;box-shadow:0 4px 0 #17242b;opacity:.85}
+#btns button[data-k=jump]{background:#efba56;margin-bottom:8vmin}
+#btns button[data-k=attack]{background:#de755f}
+#btns button[data-k=special]{background:#68cbbb}
+#btns button:active{transform:translateY(3px);box-shadow:0 1px 0 #17242b}
+#tpause{position:absolute;right:3vw;top:3vh;width:9vmin;height:9vmin;border-radius:12px;border:3px solid #17242b;background:#f4e6ca;font:800 3vmin sans-serif;pointer-events:auto}
+#tback{position:absolute;left:4vw;top:3vh;height:9vmin;padding:0 3vmin;border-radius:12px;border:3px solid #17242b;background:#f4e6ca;color:#17242b;font:800 3.2vmin 'Barlow Condensed',sans-serif;letter-spacing:1px;pointer-events:auto;display:none}
+body.touch.menuscene #tback{display:block}
+#fstip{position:fixed;left:50%;top:max(12px,env(safe-area-inset-top));transform:translateX(-50%);z-index:60;background:#efba56;color:#1d1613;font:700 clamp(12px,3.2vmin,16px) 'Barlow Condensed',sans-serif;letter-spacing:.5px;padding:8px 14px;border-radius:8px;border:2px solid #1d1613;max-width:88vw;text-align:center;pointer-events:none}
+
+#fsbtn{position:absolute;left:max(10px,env(safe-area-inset-left));bottom:max(10px,env(safe-area-inset-bottom));width:40px;height:40px;border-radius:10px;border:3px solid #17242b;background:rgba(244,230,202,.85);color:#17242b;font:800 20px sans-serif;cursor:pointer;z-index:20;opacity:.55;transition:opacity .2s}
+#fsbtn:hover{opacity:1}
+body.fs #fsbtn{opacity:.15}
+body.touch #fsbtn{width:9vmin;height:9vmin;font-size:4.6vmin;border-radius:12px;opacity:.8;left:auto;right:calc(max(3vw,env(safe-area-inset-right)) + 11vmin);top:max(3vh,env(safe-area-inset-top))}
+body.touch.portrait #fsbtn{top:max(3vh,env(safe-area-inset-top));right:max(3vw,env(safe-area-inset-right))}
+body.touch.portrait #tpause{top:calc(max(3vh,env(safe-area-inset-top)) + 14vmin)}
+
+#fshelp{position:fixed;inset:0;z-index:60;background:rgba(18,13,11,.94);color:#f4e6ca;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;text-align:center;font-family:'Barlow Condensed',sans-serif}
+#fshelp h2{font:400 clamp(22px,7vmin,48px) 'Turbo Weasel Tag','Bangers',sans-serif;color:#efba56;margin:0;letter-spacing:1px}
+#fshelp p{max-width:520px;font-size:clamp(14px,3.6vmin,20px);margin:0;opacity:.9}
+#fshelp input{width:min(90vw,520px);padding:8px;font:600 14px monospace;border:2px solid #efba56;background:#1d1613;color:#f4e6ca;border-radius:6px;text-align:center}
+#fshelp .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+#fshelp button{font:700 clamp(13px,3.4vmin,18px) 'Barlow Condensed',sans-serif;letter-spacing:1px;padding:10px 14px;border:2px solid #efba56;background:#efba56;color:#1d1613;border-radius:8px}
+#fshelp #fsclose{background:transparent;color:#efba56}

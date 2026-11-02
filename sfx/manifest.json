@@ -1,0 +1,5 @@
+{
+ "_readme": "Drop your samples (wav/mp3/m4a/ogg) in this sfx/ folder and map them here. A name can take one file or a list (one is picked at random each time). Any name not listed keeps the built-in chip sound.",
+ "_names": ["jump","shoot","heavy","hit","punch","block","hurt","die","pickup","cash","explode","ko","menu","select","bark","level","round","special","page","type","tick","win","lose","glitch","cone","coin"],
+ "sounds": {}
+}

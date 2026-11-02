@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#120d0b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Turbo &amp; Weasel">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<title>Turbo & Weasel: Cooked Edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Boogaloo&family=Patrick+Hand&family=Barlow+Condensed:wght@600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main id="stage">
+  <canvas id="game" width="960" height="540"></canvas>
+  <div id="halftone"></div>
+  <button id="fsbtn" title="Fullscreen">⛶</button>
+  <div id="touch" hidden>
+    <div id="stick"><span class="knob"></span></div>
+    <div id="btns">
+      <button data-k="special">SPECIAL</button>
+      <button data-k="jump">JUMP</button>
+      <button data-k="attack">ATTACK</button>
+    </div>
+    <button id="tpause" data-k="pause">II</button>
+    <button id="tback" data-k="back">◀ BACK</button>
+  </div>
+  <div id="rotate"><div class="phone"></div><h2>TURN YA PHONE SIDEWAYS</h2><p>Cooked Edition plays landscape, ya mongrel.</p><small>(tap to play it tiny anyway)</small></div>
+  <input id="musicdrop" type="file" accept="audio/*" multiple hidden>
+</main>
+<script src="js/atlas.js"></script>
+<script src="js/pages.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/data.js"></script>
+<script src="js/comic.js"></script>
+<script src="js/platformer.js"></script>
+<script src="js/fight.js"></script>
+<script src="js/boss.js"></script>
+<script src="js/race.js"></script>
+<script src="js/bonus.js"></script>
+<script src="js/rpg.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

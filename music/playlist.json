@@ -1,0 +1,8 @@
+{
+  "tracks": [
+    {"file": "music/theme-90s-metal.mp3", "title": "Turbo & Weasel Theme (90s Metal)", "mood": "menu, fight, boss"},
+    {"file": "music/turbo-and-weasel-metal.mp3", "title": "Turbo & Weasel (Metal)", "mood": "street, glitch, space, moon, isa, ship"},
+    {"file": "music/the-musical-ep2.mp3", "title": "Turbo & Weasel: The Musical — Ep 2", "mood": "bonus, shop"},
+    {"file": "music/ballad-of-sweetloaf-and-borkmaster.mp3", "title": "The Ballad of Sweetloaf and Borkmaster", "mood": "win, lose, credits"}
+  ]
+}
