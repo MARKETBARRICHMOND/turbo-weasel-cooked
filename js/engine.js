@@ -91,11 +91,11 @@ const Input={
  held(k){return !!Input.down[k];}
 };
 
-const SHARE_URL='https://claude.ai/artifact/XvTpnHvcarFwB2pmZyeBJV';
+const SHARE_URL='https://marketbarrichmond.github.io/turbo-weasel-cooked/';// the full-fat hosted copy (GitHub Pages): fullscreen + Add to Home Screen work there
 function fsHelp(){
  let d=document.getElementById('fshelp');if(d){d.hidden=false;return;}
  d=document.createElement('div');d.id='fshelp';
- d.innerHTML='<h2>FULLSCREEN IS BLOCKED IN HERE</h2><p>Claude\'s page keeps the game in a little frame. Open the game straight in Safari or Chrome, then tap the fullscreen button again, or use "Add to Home Screen" for the full-fat version.</p><input readonly value="'+SHARE_URL+'"><div class="row"><button id="fscopy">COPY LINK</button><button id="fsopen">OPEN IN BROWSER</button><button id="fsclose">NAH, PLAY SMALL</button></div>';
+ d.innerHTML='<h2>FULLSCREEN IS BLOCKED IN HERE</h2><p>This page keeps the game in a little frame. The full-fat version lives at its own address below: open it in Safari or Chrome, then Share → Add to Home Screen and it runs fullscreen like an app.</p><input readonly value="'+SHARE_URL+'"><div class="row"><button id="fscopy">COPY LINK</button><button id="fsopen">OPEN IN BROWSER</button><button id="fsclose">NAH, PLAY SMALL</button></div>';
  document.body.appendChild(d);
  d.querySelector('#fscopy').onclick=async e=>{e.stopPropagation();try{await navigator.clipboard.writeText(SHARE_URL);e.target.textContent='COPIED';}catch(err){const i=d.querySelector('input');i.focus();i.select();}};
  d.querySelector('#fsopen').onclick=e=>{e.stopPropagation();try{window.open(SHARE_URL,'_blank');}catch(err){}try{top.location.href=SHARE_URL;}catch(err){}};
