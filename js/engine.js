@@ -68,6 +68,12 @@ const Input={
    // first tap: go fullscreen + try to lock landscape (Android; iOS ignores quietly)
    const fs=()=>{goFullscreen(false);removeEventListener('pointerdown',fs);};
    addEventListener('pointerdown',fs);}
+  // Phones: kill double-tap zoom and pinch zoom-in in script too (iPhone Safari ignores the viewport flags); when zoomed anyway, allow the pinch-out.
+  Input.lastTouchEnd=-1e9;
+  document.addEventListener('touchend',e=>{const n=performance.now();if(n-Input.lastTouchEnd<350&&!G.zoomed&&e.cancelable)e.preventDefault();Input.lastTouchEnd=n;},{passive:false});
+  document.addEventListener('touchmove',e=>{if(e.touches.length>1&&!G.zoomed&&e.cancelable)e.preventDefault();},{passive:false});
+  ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>{if(!G.zoomed)e.preventDefault();}));
+  if(window.visualViewport){const vv=window.visualViewport;const zc=()=>zoomCheck(vv.scale||1);vv.addEventListener('resize',zc);vv.addEventListener('scroll',zc);setTimeout(zc,500);}
   const stick=document.getElementById('stick'),knob=stick.querySelector('.knob');let sid=null,sc=null;
   const stickMove=(x,y)=>{const r=stick.getBoundingClientRect();let dx=(x-(r.left+r.width/2))/(r.width/2),dy=(y-(r.top+r.height/2))/(r.height/2);const m=Math.hypot(dx,dy);if(m>1){dx/=m;dy/=m;}knob.style.transform=`translate(${dx*r.width*.3}px,${dy*r.height*.3}px)`;const L=dx<-.35,R=dx>.35,U=dy<-.5,D=dy>.5;for(const [k,v] of [['left',L],['right',R],['up',U],['down',D]]){if(v&&!Input.down[k])Input.pressed[k]=true;Input.down[k]=v;}};
   stick.addEventListener('pointerdown',e=>{sid=e.pointerId;stick.setPointerCapture(sid);stickMove(e.clientX,e.clientY);});
@@ -103,7 +109,10 @@ function fsHelp(){
  d.addEventListener('pointerdown',e=>e.stopPropagation());
 }
 // no fullscreen API here (iPhone Safari): a quick toast instead of opening a duplicate tab
-function fsTip(){let d=document.getElementById('fstip');if(!d){d=document.createElement('div');d.id='fstip';document.body.appendChild(d);}const ios=/iPhone|iPod/.test(navigator.userAgent);d.textContent=ios?'IPHONE SAFARI HAS NO FULLSCREEN. SHARE → ADD TO HOME SCREEN FOR THE FULL-FAT VERSION.':'FULLSCREEN IS NOT SUPPORTED IN THIS BROWSER. TRY CHROME OR SAFARI.';d.hidden=false;clearTimeout(fsTip.t);fsTip.t=setTimeout(()=>{d.hidden=true;},5000);}
+function fsTip(msg,ms){let d=document.getElementById('fstip');if(!d){d=document.createElement('div');d.id='fstip';document.body.appendChild(d);}const ios=/iPhone|iPod/.test(navigator.userAgent);d.textContent=msg||(ios?'IPHONE SAFARI HAS NO FULLSCREEN. SHARE → ADD TO HOME SCREEN FOR THE FULL-FAT VERSION.':'FULLSCREEN IS NOT SUPPORTED IN THIS BROWSER. TRY CHROME OR SAFARI.');d.hidden=false;clearTimeout(fsTip.t);fsTip.t=setTimeout(()=>{d.hidden=true;},ms||5000);}
+function hideTip(){const d=document.getElementById('fstip');if(d)d.hidden=true;clearTimeout(fsTip.t);}
+// If the page still gets zoomed (iPhone Safari ignores user-scalable=no), flag it, let a pinch-out through, and tell the player.
+function zoomCheck(scale){const z=scale>1.04;if(z===!!G.zoomed)return;G.zoomed=z;document.body.classList.toggle('zoomed',z);if(z)fsTip('ZOOMED IN BY ACCIDENT? PINCH OUT TO RESET',8000);else hideTip();}
 // how much of the canvas the phone's DOM buttons cover (canvas px): right column (pause/fullscreen), bottom (action buttons), left (stick). HUDs lean away from them.
 function measureTouchHud(){G.hudR=0;G.hudB=0;G.hudL=0;if(!G.touch||!G.canvas)return;try{const r=G.canvas.getBoundingClientRect();if(!r.width)return;const s=W/r.width;let left=Infinity,top=Infinity,right=-Infinity;['tpause','fsbtn'].forEach(id=>{const b=document.getElementById(id);if(!b)return;const q=b.getBoundingClientRect();if(q.width&&q.top<r.top+r.height*.4)left=Math.min(left,q.left);});document.querySelectorAll('#btns button').forEach(b=>{const q=b.getBoundingClientRect();if(q.width)top=Math.min(top,q.top);});const st=document.getElementById('stick');if(st){const q=st.getBoundingClientRect();if(q.width)right=q.right;}if(left<r.right)G.hudR=Math.ceil((r.right-left)*s)+8;if(top<r.bottom)G.hudB=Math.ceil((r.bottom-top)*s)+8;if(right>r.left)G.hudL=Math.ceil((right-r.left)*s)+8;}catch(e){}}
 function goFullscreen(popOut){

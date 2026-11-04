@@ -1,6 +1,8 @@
 @font-face{font-family:'Turbo Weasel Tag';src:url(../assets/fonts/TurboWeaselTag.otf) format('opentype');font-display:block}
 @font-face{font-family:'Turbo Weasel Hand';src:url(../assets/fonts/TurboWeaselHand.otf) format('opentype');font-display:block}
 html,body{margin:0;height:100%;background:#120d0b;overflow:hidden;font-family:'Barlow Condensed','Arial Narrow',sans-serif;color:#f4e6ca;-webkit-user-select:none;user-select:none;touch-action:none}
+#stage,#game,#touch,#touch button,#stick,#fsbtn{touch-action:none;-webkit-touch-callout:none}
+body.zoomed,body.zoomed *{touch-action:pinch-zoom!important}
 #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:
  radial-gradient(ellipse at 50% 40%,#2a1d16 0%,#120d0b 70%)}
 #game{width:min(100vw,calc(100vh*16/9));height:min(100vh,calc(100vw*9/16));image-rendering:auto;cursor:default;box-shadow:0 0 0 4px #000,0 0 60px #000}
