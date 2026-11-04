@@ -194,3 +194,8 @@ Final sweep: engine, input, phone. All fixes, no new creative-licence extras thi
 - Desktop: the fullscreen button works on mouse/keyboard devices too (its handler was only wired on touch).
 - No fullscreen API (iPhone Safari outside the frame): a short on-screen tip instead of opening a duplicate tab.
 - 30Hz screens / low-power mode no longer trigger the blurry 1x fallback; it only drops resolution when frames are ragged or the draw itself is heavy.
+
+## v1.6.4 (4 Nov 2026)
+Hosted copy + phone zoom fix.
+- The game now also lives at https://marketbarrichmond.github.io/turbo-weasel-cooked/ (GitHub Pages, deployed from the `turbo-weasel-cooked` repo by Actions). Safari → Share → Add to Home Screen runs it fullscreen; a web manifest and home-screen icon were added for that. The claude.ai link's fullscreen help now points there.
+- Phones: double-tap no longer zooms the page and a pinch can't zoom in (iPhone Safari ignores the viewport flags, so it's done in script too). If the page still ends up zoomed, a pinch-out is let through and a hint says so.
