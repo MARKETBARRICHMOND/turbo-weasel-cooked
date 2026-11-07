@@ -27,6 +27,7 @@ function ComicScene(beats,opts={}){
   if(b.sfx){setTimeout(()=>{comicWord(b.sfx,W*.5+rnd(-200,200),H*.4+rnd(-80,80),pick([AMBER,RED,'#f7d96a',TEAL]),58);Audio.sfx(b.sfx==='WOOF'?'bark':'heavy');shake(6);},250);}
   const prev=S.beats[S.i-1];S.pageTurn=(!prev||prev.page!==b.page)?1:0;if(S.pageTurn)Audio.sfx('page');
   if(S.from&&S.to&&!S.pageTurn){const k=ease(Math.min(1,S.moveT));S.from={x:lerp(S.from.x,S.to.x,k),y:lerp(S.from.y,S.to.y,k),w:lerp(S.from.w,S.to.w,k),h:lerp(S.from.h,S.to.h,k)};}// same-page beat: pan from where the camera actually is
+  if (S.pageTurn) { S.from=null; S.to=null; }
   S.moveT=0;
  }
  function finish(){if(S.done)return;S.done=true;S.onDone&&S.onDone();}
@@ -55,7 +56,7 @@ function ComicScene(beats,opts={}){
   if(pg.ready){
    const img=pg.img,target=focusRect(b.focus||'full',img.width,img.height);
    // Ken Burns: ease from previous focus to this one, with a slow drift
-   if(!S.from||S.pageTurn>0&&S.moveT===0)S.from=S.to||target;
+   if(!S.from)S.from=target;
    S.to=target;const k=ease(S.moveT);
    const fr={x:lerp(S.from.x,S.to.x,k),y:lerp(S.from.y,S.to.y,k),w:lerp(S.from.w,S.to.w,k),h:lerp(S.from.h,S.to.h,k)};
    const drift=1+.035*Math.sin(S.t*.4);

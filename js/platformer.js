@@ -196,6 +196,7 @@ function PlatformScene(chapter,run,opts={}){
   const col=S.col;const cam=S.cam;const camY=S.camY;const groundScr=(GROUND-camY)*ZOOM;
   drawSky(c,chapter.theme,groundScr,S.t);
   drawPanorama(c,chapter.theme,cam*ZOOM,{groundY:480,oy:groundScr-480,parallax:.5,filter:chapter.theme==='glitch'?'hue-rotate(40deg) saturate(1.3)':undefined});
+  drawChapterLandmarks(c, chapter, cam * ZOOM, groundScr);
   // distance haze so the backdrop sits behind the action
   {const hz=c.createLinearGradient(0,groundScr-260,0,groundScr);hz.addColorStop(0,'rgba(0,0,0,0)');hz.addColorStop(1,hexA((SKY[chapter.theme]||SKY.street)[2],.2));c.fillStyle=hz;c.fillRect(0,groundScr-260,W,260);}
   if(chapter.theme==='glitch'){c.fillStyle='rgba(60,40,120,.28)';c.fillRect(0,0,W,H);if(G.frame%47<3){c.fillStyle='rgba(255,255,255,.08)';c.fillRect(0,rnd(H),W,rnd(10,40));}}

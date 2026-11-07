@@ -40,23 +40,17 @@ const CHAPTERS=[
   ]},
  {id:'lennox',n:2,issue:1,title:'LENNOX STREET REPO',sub:'106 LENNOX ST, NORTH RICHMOND · THE TOP FLAT',theme:'street',music:'street',length:3600,race:true,
   enemies:['thug','thug','gunner'],boss:'lucifer',bossName:'LUCIFER',bossTag:'106 LENNOX ST · TOP FLAT · “MECHANIC”',arena:'lennox',bonus:null,collect:{label:'BIKE PARTS',singular:'BIKE PART',need:3,item:'part'},
-  objective:'GET TURBO’S BIKE BACK · THE GEAR GUY WANTS HIS MONEY',
+  objective:'FIND THE THREE PARTS · FINISH THE BIKE SALE AT 106',
   intro:[
-   {page:'I01-P06',focus:'top',caption:'THE NEXT MORNING. LENNOX STREET. SOMETHING IS MISSING.',music:'street'},
-   {page:'I01-P06',focus:'mid',lines:[['TURBO','WHERE’S MY FUCKING BIKE.','shout'],['WEASEL','Where’d you leave it?'],['TURBO','Chained to the pole. Out front. Like a responsible adult.'],['WEASEL','Turbz, the pole’s gone too.']]},
-   {page:'I02-P11',focus:'top',lines:[['GEAR GUY','Morning, boys. Lovely day. You owe me eleven hundred.'],['WEASEL','We’re good for it.'],['GEAR GUY','You’re good for a lot of things. Money isn’t one of them.']]},
-   {page:'I02-P11',focus:'bot',lines:[['TURBO','I’ll sell the bike. Bike’s worth two grand easy.'],['GEAR GUY','The bike Lucifer’s got on his balcony? Across the road? With your chain still on it?'],['TURBO','…THAT little cunt.','shout']]},
-   {page:'I01-P13',focus:'mid',lines:[['WEASEL','Lucifer. Tiny bloke. Black wife-beater. Owns the whole top flat of 106 and calls it a “mechanic shop”.'],['TURBO','It’s a chop shop, Weasel.'],['WEASEL','It’s a chop shop with a vibe. He fixed my scooter once. I think it was my scooter.'],['TURBO','Parts are all over the street. Grab what’s left of my bike on the way. Nobody steals from a bloke who’s already broke.']]},
+   {page:'extra-sale',focus:'full',caption:'106 LENNOX STREET. THE TOP FLAT.',lines:[['TURBO','Sold the bike. Reckon that’ll get the gear bloke off our backs?'],['WEASEL','Once Lucifer actually pays us.']]},
+   {page:'extra-parts',focus:'full',lines:[['LUCIFER','Three bits missing, habibi. Whole bike price is for a whole bike.'],['TURBO','They were on it when I sold it.'],['WEASEL','There’s your pedal. Holding his bloody window open.']]}
   ],
   preboss:[
-   {page:'I02-P14',focus:'top',lines:[['LUCIFER','Turbooo! Habibi! Come up, come up. Shoes off, it’s a workshop.'],['TURBO','That’s my bike.'],['LUCIFER','Was. Now it is inventory.']]},
-   {page:'I02-P14',focus:'bot',lines:[['LUCIFER','Everything in here is stolen, bro. That’s what makes the prices so good.'],['WEASEL','That’s… actually a solid business model.'],['TURBO','Weasel.'],['LUCIFER','Boys! Come say hello to Turbo!'],['WEASEL','(Why are there so many doors in this flat.)','thought']]},
+   {page:'extra-parts',focus:[0,.03,1,.9],lines:[['WEASEL','Three bits. Count ’em.'],['LUCIFER','Parts and labour, boys. You still owe me labour.'],['TURBO','I’ll give you some fucking labour.']]}
   ],
   outro:[
-   {page:'I01-P12',focus:'mid',sfx:'SHANK',lines:[['LUCIFER','Okay. OKAY. You win, habibi. Respect. Nobody has ever beaten me in my own flat. My mum, once.'],['TURBO','Bike.'],['LUCIFER','Bike is gone, bro. I sold it to a guy in Footscray. Twenty minutes ago. From the balcony. While you were on the stairs.']]},
-   {page:'I01-P12',focus:'bot',lines:[['TURBO','I’m going to fold you into the bin.'],['LUCIFER','WAIT. Wait wait wait. Better than a bike. Brand new Ninebot. Electric. Twenty-eight kays an hour, downhill thirty-five. Stolen, but spiritually yours.'],['WEASEL','Turbz. That’s a free scooter.']]},
-   {page:'I01-P13',focus:'top',lines:[['LUCIFER','And listen. Every Sunday, North Richmond Scooter Grand Prix. Stolen scooters only. Winner takes the pot. You come back to my shop, I swap you parts. Good parts. Stolen parts.'],['TURBO','…Fine. But I’m not taking my shoes off.'],['LUCIFER','Habibi. It’s a workshop.']]},
-   {page:'I01-P13',focus:'bot',lines:[['GEAR GUY','Boys. Eleven hundred.'],['WEASEL','We’ve got a scooter and a dream.'],['GEAR GUY','Sunday, then. I’ve got money on Lucifer.']]},
+   {page:'extra-scooter',focus:'full',lines:[['LUCIFER','Sale money went across the road. Ask your dealer. Take the Ninebot for the trouble.'],['WEASEL','Got a receipt?'],['LUCIFER','For that scooter? Fuck, no.']]},
+   {page:'extra-grid',focus:'full',caption:'SUNDAY. NORTH RICHMOND SCOOTER GP.',lines:[['WEASEL','What’s first prize?'],['TURBO','Cash.'],['WEASEL','Christ. An actual business plan.']]}
   ]},
  {id:'memory',n:2,issue:3,covers:[2,3,4],title:'FIRST THING YOU REMEMBER',sub:'THE FLAT · THE BAR · 3AM',theme:'glitch',music:'glitch',length:3000,
   enemies:['thug','gunner','drone'],boss:'riot',bossName:'RIOT COMMAND',bossTag:'VICTORIA POLICE · 3AM NOISE COMPLAINT',arena:'street',bonus:'pokies',collect:{label:'MEMORIES',singular:'MEMORY',need:3,item:'memory'},
@@ -65,7 +59,7 @@ const CHAPTERS=[
    {page:'I02-P14',focus:'top',caption:'LATER. THE FLAT. MRS WEASEL WAKES UP FROM HER FIRST HIBERNATION.'},
    {page:'I02-P14',focus:'mid',lines:[['MRS WEASEL','Had that Robbie Williams song stuck in my head since I woke up.'],['MRS WEASEL','Rock DJ. First thing I remember.']]},
    {page:'I02-P14',focus:'bot',lines:[['WEASEL','Tonight?'],['MRS WEASEL','No. Ever.'],['WEASEL','…Right. Fuck.']]},
-   {page:'I03-P01',focus:'mid',lines:[['WEASEL','What happened before the song?'],['TURBO','Dunno. I was scraping the bong. Then I was scraping the bong but, like, earlier.']]},
+   {page:'I03-P01',focus:'mid',lines:[['WEASEL','What happened before the song?'],['TURBO','Dunno. Old shitbox. Radio on. Can’t remember getting in the thing.']]},
    {page:'I03-P02',focus:'mid',lines:[['WEASEL','Same fucking song.'],['TURBO','Everyone? Bork? The bloke at the servo? The dog?'],['WEASEL','The dog hums it.']]},
    {page:'I03-P10',focus:'mid',lines:[['WEASEL','It’s not the song. It’s that there’s nothing before it.'],['TURBO','If something’s fucked, I’d rather you noticed it than me.'],['TURBO','Right. We go round the street and we ask every cunt what they remember. Like detectives. Cooked detectives.']]},
   ],
@@ -77,27 +71,26 @@ const CHAPTERS=[
    {page:'I04-P05',focus:'top',lines:[['ROBBIE','Victoria Street, Richmond—all of it’s just my little simulation.'],['TURBO','Our whole life?'],['ROBBIE','And you two? My favourite toys.']]},
    {page:'I04-P09',focus:'mid',lines:[['WEASEL','My missus. She part of the joke too?'],['ROBBIE','She’s in the world, isn’t she?'],['WEASEL','That wasn’t what I asked.'],['WEASEL','…Also, if this is your game, the servo pies are fucking shithouse. Fix that. And free gear. Obviously.']]},
    {page:'I04-P16',focus:'bot',lines:[['WEASEL','What if breaking it is what he wants?'],['TURBO','Then we’ll break it wrong.'],['TURBO','Let’s break the fuckin’ game.','shout']]},
-   {page:'I04-P16',focus:'top',sfx:'BANG BANG',lines:[['OFFICER','POLICE! Noise complaint. Also the bong on the windowsill. Also everything else.','shout'],['WEASEL','That’s a vase.'],['OFFICER','It’s bubbling, mate.']]},
-   {page:'I04-P16',focus:'mid',lines:[['MRS WEASEL','If you two get nicked before the servo run I’m selling your gear and keeping the glass.'],['TURBO','She’s a keeper, Weas.'],['WEASEL','She’s a fucking liability with great legs. Shields up.']]},
+   {page:'extra-riot',focus:'full',sfx:'BANG BANG',lines:[['OFFICER','POLICE! Noise complaint. Also the bong on the windowsill. Also everything else.','shout'],['WEASEL','That’s a vase.'],['OFFICER','It’s bubbling, mate.']]},
+   {page:'extra-riot',focus:'full',lines:[['MRS WEASEL','If you two get nicked before the servo run I’m selling your gear and keeping the glass.'],['TURBO','She’s a keeper, Weas.'],['WEASEL','She’s a fucking liability with great legs. Shields up.']]},
   ],
   outro:[
-   {page:'I04-P16',focus:'bot',lines:[['TURBO','Public Order Response. Over a billy.'],['WEASEL','Over a billy and a simulated pub, in fairness.'],['MRS WEASEL','You left the cone piece in the cop’s pocket. He’ll be back.']]},
+   {page:'extra-riot-after',focus:'full',lines:[['TURBO','Public Order Response. Over a billy.'],['WEASEL','Over a billy and a simulated pub, in fairness.'],['MRS WEASEL','You left the cone piece in the cop’s pocket. He’ll be back.']]},
   ]},
  {id:'break',n:3,issue:5,title:'LET’S BREAK THE GAME',sub:'THE SERVO · THE FOOTY CLUB · THE CELLS',theme:'street',music:'street',length:3800,
   enemies:['thug','gunner','cop','cop'],boss:'plague',bossName:'THE PLAGUE DOCTOR',bossTag:'SERVO FORECOURT · SELF-APPOINTED',arena:'servo',bonus:'slab',
-  objective:'ROB THE SERVO · TORCH THE FOOTY CLUB · DON’T GET NICKED',
+  objective:'COVER THE AWNING BILL · REACH THE SERVO · GET BACK TO BORK',
   intro:[
    {page:'I05-P01',focus:'top',lines:[['TURBO','Right, Robbie. Watch this.'],['WEASEL','We don’t actually know where he’s watching from.'],['TURBO','Start local.']]},
    {page:'I05-P04',focus:'bot',sfx:'WHOOMP',lines:[['BORKMASTER','That’s my fucking awning.','shout'],['TURBO','It’s only a simulation!'],['BORKMASTER','Then simulate a fucking hose!']]},
    {page:'I05-P06',focus:'mid',lines:[['WEASEL','So we save the pub by robbing the neighbour?'],['TURBO','The neighbour’s a servo. The servo is a corporation. We’re basically a union.'],['WEASEL','Our accountant’s going to be a magistrate.']]},
   ],
   preboss:[
-   {page:'I05-P09',focus:'top',caption:'THE SERVO FORECOURT. A JEEP. A MAN IN A BEAK.',lines:[['PLAGUE DOCTOR','Put the bag down. Put the gear down. Put yourselves down. This forecourt is a QUARANTINE ZONE.'],['TURBO','Mate, it’s a Caltex.']]},
-   {page:'I05-P09',focus:'bot',lines:[['WEASEL','Why has he got a flamethrower?'],['PLAGUE DOCTOR','Sterilisation. Starting with my own vehicle, which you have BREATHED near.'],['WEASEL','He’s torching his own jeep. He’s actually fucking torching it.']]},
-   {page:'I05-P09',focus:'mid',sfx:'WHOOMP',lines:[['TURBO','Insurance job. Respect.'],['PLAGUE DOCTOR','Breathe in, degenerates. Breathe it ALL in.'],['WEASEL','Shoot the beak. The beak is the bit.']]},
+   {page:'extra-beak',focus:'full',caption:'SERVO FORECOURT. THE MAN BESIDE THE JEEP HAS A PILOT LIGHT.',lines:[['PLAGUE DOCTOR','Put the bag down. Quarantine zone.'],['TURBO','Mate, it’s a servo.']]},
+   {page:'extra-jeep',focus:'full',lines:[['WEASEL','That your Jeep?'],['PLAGUE DOCTOR','Was. Stand clear.'],['TURBO','Bit fucking late for that.']]}
   ],
   outro:[
-   {page:'I05-P13',focus:'mid',caption:'RICHMOND POLICE STATION. THE CELLS. A SMELL. THE PLAGUE DOCTOR IS IN THE NEXT CELL, STILL SMOKING.',lines:[['TURBO','This is temporary.'],['WEASEL','Everything is. That’s what makes prison annoying.'],['TURBO','Shazza from the Market Bar bailed Angus out once with a tray of pots and a look. We need Shazza.']]},
+   {page:'I05-P13',focus:'mid',caption:'THE POLICE VAN. TURBO CAN STILL SMELL THE JEEP.',lines:[['TURBO','This is temporary.'],['WEASEL','Everything is. That’s what makes prison annoying.'],['TURBO','Shazza from the Market Bar bailed Angus out once with a tray of pots and a look. We need Shazza.']]},
    {page:'I05-P15',focus:'bot',sfx:'CLANK',lines:[['ROBBIE','They’re with me.'],['WEASEL','Oh, good. Our other problem.']]},
    {page:'I05-P17',focus:'mid',lines:[['WEASEL','You getting us off?'],['ROBBIE','I’m getting you out. Different thing.'],['WEASEL','Bork’s still in there.'],['ROBBIE','We’re taking the talent.']]},
    {page:'I05-P19',focus:'mid',music:'space',lines:[['WEASEL','Where’s the other end?'],['ROBBIE','Somewhere with room to grow.'],['WEASEL','That’s not an address!','shout']]},
@@ -115,8 +108,8 @@ const CHAPTERS=[
    {page:'I06-P13',focus:'mid',sfx:'BLAM',lines:[['CROWE','Eyes down.'],['CROWE','Time to go!','shout'],['TURBO','We could take them here.'],['WEASEL','Good. Take them somewhere we aren’t.']]},
   ],
   preboss:[
-   {page:'I06-P16',focus:'top',lines:[['CROWE','Dock’s through there. Past the bouncer.'],['TURBO','Space has bouncers?'],['CROWE','Space is mostly bouncers.']]},
-   {page:'I06-P16',focus:'bot',lines:[['BIG GAZZ','Locals only, earth dickhead.'],['TURBO','Mate, I’ve been a local everywhere I’ve been barred from.']]},
+   {page:'extra-gazz',focus:'full',lines:[['CROWE','Dock’s through there. Past the bouncer.'],['TURBO','Space has bouncers?'],['CROWE','Space is mostly bouncers.']]},
+   {page:'extra-gazz-fight',focus:'full',lines:[['BIG GAZZ','Locals only, earth dickhead.'],['TURBO','Mate, I’ve been a local everywhere I’ve been barred from.']]},
   ],
   outro:[
    {page:'I06-P17',focus:'mid',lines:[['ROBBIE','I’ll make sure you’re compensated.'],['CROWE','Oh, I know you will, you fuckin’ dickhead.'],['WEASEL','His rescue. His bill.'],['CROWE','You’re learning.']]},
@@ -135,8 +128,8 @@ const CHAPTERS=[
   preboss:[
    {page:'I07-P12',focus:'top',sfx:'VWORP',lines:[['BORKMASTER','If that’s a portal for a delivery, you’re fucking late.'],['TURBO','Bork! We’re in space.'],['BORKMASTER','I’m in work. What d’you want?']]},
    {page:'I07-P13',focus:'bot',lines:[['TURBO','That was us. Come with us, mate.'],['BORKMASTER','Not without Angus and the dog.'],['WEASEL','ISA’s tracked the opening. Something big is coming down the ring.']]},
-   {page:'I07-P13',focus:'top',sfx:'HMMMMMM',lines:[['TURBO','Why’s it so quiet. Why’s me chest gone funny.'],['WEASEL','Black triangle. No sound. Three lights. That’s a TR-3B, Turbz. That’s the one off the forums.'],['TURBO','Which forums?'],['WEASEL','The ones Mrs Weasel told me to stop reading at 4am.']]},
-   {page:'I07-P13',focus:'mid',lines:[['TRIXY','DESIGNATION: TRIXY. LIFE FORCE RECOVERY VEHICLE. YOUR ACCOUNTS ARE OVERDRAWN. COMMENCING WITHDRAWAL.','radio'],['WEASEL','It’s a repo Dorito.'],['TURBO','Nobody repos my life force. It’s ninety percent VB.']]},
+   {page:'extra-triangle',focus:'full',sfx:'HMMMMMM',lines:[['TURBO','Why’s it so quiet. Why’s me chest gone funny.'],['WEASEL','Black triangle. No sound. Three lights. That’s a TR-3B, Turbz. That’s the one off the forums.'],['TURBO','Which forums?'],['WEASEL','The ones Mrs Weasel told me to stop reading at 4am.']]},
+   {page:'extra-drain',focus:'full',lines:[['TRIXY','DESIGNATION: TRIXY. LIFE FORCE RECOVERY VEHICLE. YOUR ACCOUNTS ARE OVERDRAWN. COMMENCING WITHDRAWAL.','radio'],['WEASEL','It’s a repo Dorito.'],['TURBO','Nobody repos my life force. It’s ninety percent VB.']]},
   ],
   outro:[
    {page:'I07-P18',focus:'mid',lines:[['BORKMASTER','You came back.'],['TURBO','Who else knows where you keep the clean glasses?']]},
@@ -154,9 +147,10 @@ const CHAPTERS=[
   ],
   preboss:[
    {page:'I08-P12',focus:'top',lines:[['TURBO','We actually sold all of it.'],['WEASEL','Mad system. Give them something. They pay.']]},
-   {page:'I08-P12',focus:'bot',lines:[['CROWE','Opening night. Permanent seat’s taken. Who wants to test the floor?'],['TURBO','Is this a fight or a housewarming?'],['CROWE','In space, mate, same thing.']]},
+   {page:'extra-vip',focus:'full',lines:[['CROWE','Opening night. Permanent seat’s taken. Who wants to test the floor?'],['TURBO','Is this a fight or a housewarming?'],['CROWE','In space, mate, same thing.']]},
   ],
   outro:[
+   {page:'extra-spar',focus:'full',lines:[['BORKMASTER','Floor held. You break the chair, you buy it.'],['CROWE','Chair’s part of my deal, mate.']]},
    {page:'I08-P16',focus:'mid',sfx:'KA-CHING',lines:[['WEASEL','Paying the initial consignment. All of it. Confirm it.'],['ROBBIE','Received in full. Original gear account settled.'],['WEASEL','Beautiful. Got that saved.']]},
    {page:'I08-P22',focus:'top',music:'moon',lines:[['WEASEL','If it’s Robbie, we’re square.'],['MONK LEADER','Your private account is irrelevant.']]},
    {page:'I08-P24',focus:'bot',lines:[['WEASEL','They’re following.'],['BORKMASTER','Old temple. Blood Moon of Kraggar Seven. Just need somewhere to breathe.']]},
@@ -206,7 +200,7 @@ const CHAPTERS=[
 const BANTER={
  street:[['WEASEL','Why is saving a pub a fucking parkour qualification?'],['TURBO','Keeon’s bong has more frequent-flyer points than us.'],['WEASEL','Because you keep leaving it on the 109, cunt.'],['TURBO','That cop’s got a Hawthorn tattoo. Shoot him twice.'],['WEASEL','I’ve got four bucks, a dead lighter and your emergency cone piece.'],['TURBO','Diversified portfolio.'],['SHAZZA','Oi! If you two die before the bar tab’s paid I’m putting your faces on the pokies.'],['TURBO','Shazza’s been pouring pots at the Market Bar since before the bar had a floor.'],['WEASEL','She once knocked Carl out with a tray. Then charged him for the tray.'],['MRS WEASEL','Pick up milk. And a lighter. And don’t get shot in the face, I like the face.'],['TURBO','Did Trudy text back?'],['WEASEL','She sent a photo of her staff. Her ACTUAL staff. The glowing one.'],['TURBO','Still a yes, mate.']],
  glitch:[['WEASEL','The sky’s doing the thing again.'],['TURBO','Don’t look at it. It’s like a magistrate.'],['WEASEL','That bloke just walked through a wall and apologised.'],['TURBO','Richmond’s always been like that.'],['WEASEL','Rock DJ. Rock DJ. ROCK fucking DJ.'],['MRS WEASEL','The sky’s loading again. Come to bed or come to the bong, pick one.'],['TURBO','Your missus runs a tight ship.'],['WEASEL','She runs the whole fleet, mate.']],
- space:[['TURBO','Three-eyed cunt looked at me funny. All three.'],['WEASEL','We’re in space and there’s still a bloke selling knock-off Nike TNs.'],['TURBO','Space customs asked if I had anything to declare. I said “yeah, nah.” They wrote it down.'],['WEASEL','Still got a draught.'],['TURBO','Somebody’s paying rent on all this.'],['WEASEL','That alien sheila with the three… everything. She winked.'],['TURBO','Which eye.'],['WEASEL','Yes.'],['TURBO','Space gear is the same as Richmond gear but the bag’s shinier.']],
+ space:[['TURBO','Three-eyed cunt looked at me funny. All three.'],['WEASEL','We’re in space and there’s still a bloke selling knock-off Nike TNs.'],['TURBO','Space customs asked if I had anything to declare. I said “yeah, nah.” They wrote it down.'],['WEASEL','Still got a draught.'],['TURBO','Somebody’s paying rent on all this.'],['WEASEL','That alien sheila with the three… everything. She winked.'],['TURBO','Which eye.'],['WEASEL','Yes.'],['TURBO','Can’t lose your gear out here. Glows through your fucking pockets.']],
  isa:[['WEASEL','ISA stands for Intergalactic Space Authority. Or Agency. They couldn’t decide either.'],['TURBO','Every door here needs a permit. I’ve never had a permit.'],['WEASEL','Forward, then back. Forward, then back.'],['TURBO','I know what forward is, Weasel.'],['WEASEL','Permit for the bong. Permit for the cone piece. Permit for the permit.'],['TURBO','Trudy’s got a cousin in ISA admin. Big blue eyes. Terrifying filing.']],
  moon:[['TURBO','Lovely. No neighbours.'],['WEASEL','No exits either.'],['TURBO','Follow the dirt. That’s our level.'],['WEASEL','That monk just said my name in my dad’s voice. I never met my dad.'],['TURBO','Red sky at night, shepherd’s cooked.'],['WEASEL','The High Monk’s a sheila, Turbz. Mind the hands.'],['TURBO','I mind everyone’s hands. It’s why I’m single.']],
  ship:[['WEASEL','He’s playing the song. He’s playing the fucking song on loop.'],['TURBO','I actually quite like the song.'],['WEASEL','Never say that again.'],['TURBO','Bridge. Pods. Leave. In that order.'],['WEASEL','That’s the first plan you’ve had with an order in it.'],['TURBO','If we live, Shazza said the first slab’s on the house.'],['WEASEL','If we live, I’m marrying my missus again. Properly. With a bong under the arch.']],
@@ -262,9 +256,6 @@ const EGGS={
  smoko:'THE GREEN BASTARD clocks on in Scrap Mode. Shazza has left a billy on the bar. Don’t tell the magistrate.',
 };
 
-// The Plague Doctor rides the hazmat sheet (recoloured in-engine) with a drawn beak mask.
-if(typeof ATLAS!=='undefined'&&ATLAS.fight.warden)ATLAS.fight.plague={...ATLAS.fight.warden};
-if(typeof ATLAS!=='undefined'&&ATLAS.fight.collector)ATLAS.fight.lucifer={...ATLAS.fight.collector,targetHeight:98};
 CHAPTERS.forEach((ch,i)=>ch.n=i+1);
 /* scooter grand prix roster: stolen scooters only, scumbags only */
-const RACERS=[{id:'lucifer',name:'LUCIFER',col:'#de755f',quip:'Habibi, it’s a race.'},{id:'karl',name:'CRAZY CARL',col:'#df9665',quip:'Barred from the track too.'},{id:'borkmaster',name:'BORKMASTER',col:'#e47f59',quip:'Pub’s closed. For this.'},{id:'angus',name:'WACKY ANGUS',col:'#9bd36c',quip:'Took the bin lids off for weight.'},{id:'fredo',name:'FREDDO',col:'#c9a37a',quip:'WOOF.'},{id:'crowe',name:'SPACE RUSSELL CROWE',col:'#d8b25f',quip:'Are you not entertained.'},{id:'weed',name:'THE GREEN BASTARD',col:'#98ef87',quip:'Where am I.'},{id:'riot',name:'RIOT COMMAND',col:'#7fb0ff',quip:'Move along. Fast.'}];
+const RACERS=[{id:'courier',name:'NIGHT COURIER',col:'#88c8ea',quip:'Only one star? I was racing, mate.'},{id:'lucifer',name:'LUCIFER',col:'#de755f',quip:'Habibi, it’s a race.'},{id:'karl',name:'CRAZY CARL',col:'#df9665',quip:'Barred from the track too.'},{id:'borkmaster',name:'BORKMASTER',col:'#e47f59',quip:'Pub’s closed. For this.'},{id:'angus',name:'WACKY ANGUS',col:'#9bd36c',quip:'Took the bin lids off for weight.'},{id:'fredo',name:'FREDDO',col:'#c9a37a',quip:'WOOF.'},{id:'crowe',name:'SPACE RUSSELL CROWE',col:'#d8b25f',quip:'Are you not entertained.'},{id:'weed',name:'THE GREEN BASTARD',col:'#98ef87',quip:'Where am I.'},{id:'riot',name:'RIOT COMMAND',col:'#7fb0ff',quip:'Move along. Fast.'}];

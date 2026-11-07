@@ -199,3 +199,25 @@ Final sweep: engine, input, phone. All fixes, no new creative-licence extras thi
 Hosted copy + phone zoom fix.
 - The game now also lives at https://marketbarrichmond.github.io/turbo-weasel-cooked/ (GitHub Pages, deployed from the `turbo-weasel-cooked` repo by Actions). Safari → Share → Add to Home Screen runs it fullscreen; a web manifest and home-screen icon were added for that. The claude.ai link's fullscreen help now points there.
 - Phones: double-tap no longer zooms the page and a pinch can't zoom in (iPhone Safari ignores the viewport flags, so it's done in script too). If the page still ends up zoomed, a pinch-out is let through and a hint says so.
+
+## v1.7.0 (7 Nov 2026)
+
+Scooter GP now has rear-view rider art for both heroes and every opponent. The Moon Cup uses eight different kart bodies. Each course has six ordered sectors with illustrated landmarks, and the sector name follows your position. In Richmond the local night courier takes the seventh grid slot so Crowe first appears in the space storyline. The race menu previews the actual grids and the workshop. A finish-line quip stays on screen long enough to read.
+
+**Comic continuity and creative extras for veto**
+
+| Chapter | Comic connection and game material |
+|---|---|
+| Market Bar Mayhem | Issue 1 establishes the robbery, Carl and Bork’s damage bill. The approach passes the grocer, tram and market frontage. |
+| Lennox Street Repo | Game interlude. Turbo sells his bike to cover the dealer debt. Lucifer holds the payment over three parts, then settles with the dealer and hands over a stolen Ninebot. Four illustrated beats cover the sale, parts, scooter and Sunday GP. |
+| First Thing You Remember | Issues 2–4. Turbo remembers the old car radio. The street interviews lead to Robbie’s claim about the simulation. Two new panels depict the noise-complaint raid and its aftermath. |
+| Let’s Break the Game | Issue 5. The burnt awning motivates the cash run. Two new servo panels show Plague Doctor and his burning Jeep before the police van and Robbie’s intervention. |
+| Welcome to the Real Shithole | Issue 6. Crowe helps the boys reach the dock. Big Gazz gets two illustrated beats at the hatch. Robbie fronts the consignment on tick. |
+| One Address. One Opening. | Issue 7. The boys come back for Bork, who insists on bringing Angus and Freddo. Trixy’s interception gets two separate panels of the craft and its drain beam. |
+| Grand Opening, Outstanding Balance | Issue 8. The delivery pays Robbie’s original gear account. Crowe’s permanent seat is a separate deal. Two new pub panels cover the friendly spar and the furniture bill gag. |
+| Blood Moon, Last Drinks | Issue 9. The ISA pursues the crew despite the settled account. The temple approach gains lunar industrial scenery and basalt gates. |
+| Rock DJ Reckoning | Issue 10. The crew needs the bridge release to reach the pods. Robbie transforms into a crimson, mechanical-armed second form during the fight. His fate after the escape stays open. |
+
+Additional artwork includes the Moon starting-grid panel, twelve roadside landmarks, eight scenery sprites including spectator groups, gum trees, bins and lunar telemetry, the sixteen mounted rider/vehicle combinations, separate eight-pose sheets for Lucifer and Plague Doctor mapped to the existing fight moves, and a sixteen-pose Rock DJ sheet. Turbo and Weasel have distinct scooter and kart stances that lean through turns. Chapter backgrounds use illustrated landmarks at fixed positions. The comic camera starts each new page from that page’s own framing.
+
+The new panels use the supplied handoff and existing comic art as references. The recovered dialogue and visual inventory were used as adaptation references.

@@ -19,7 +19,7 @@ function TitleScene(){const S={t:0,sel:0,egg:null,eggT:0,menuT:0,menu:true,cov:0
   {label:'CONTINUE',sub:SAVE.chapter>0?`Chapter ${Math.min(CHAPTERS.length,SAVE.chapter+1)} · ${CHARS[SAVE.char].name} · ${DIFF[SAVE.difficulty].name}`:'No save yet, ya tourist',disabled:SAVE.chapter<=0&&SAVE.profile.level<=1,go:()=>startChapter(Math.min(SAVE.chapter,CHAPTERS.length-1))},
   {label:'CHAPTER SELECT',sub:'Replay anything you’ve cleared',disabled:SAVE.unlockedChapter<=0,go:()=>setScene(ChapterSelect())},
   {label:'SCRAP MODE',sub:'Street-Fighter duels. Winner buys.',go:()=>setScene(ScrapSelect())},
-  {label:'SCOOTER GP',sub:SAVE.scooter?'Stolen scooters only. Winner takes the pot.':'Get Turbo’s bike back first (Chapter 2)',disabled:!SAVE.scooter,go:()=>setScene(RaceSelect())},
+  {label:'SCOOTER GP',sub:SAVE.scooter?'Stolen scooters only. Winner takes the pot.':'Finish the bike sale in Chapter 2',disabled:!SAVE.scooter,go:()=>setScene(RaceSelect())},
   {label:'GALLERY',sub:`Covers + ${Object.keys(SAVE.pages).length}/${Object.keys(PAGE_FILES).length} comic pages found`,go:()=>setScene(GalleryScene())},
   {label:'DROP MUSIC',sub:Audio.userMusic?'Playing: '+(Audio.nowPlaying||'your tracks'):'Load your own tracks (mp3/wav/m4a)',go:()=>{const d=document.getElementById('musicdrop');if(d)d.click();}},
   {label:'SETTINGS',sub:'Sound, shake, controls',go:()=>setScene(SettingsScene())},

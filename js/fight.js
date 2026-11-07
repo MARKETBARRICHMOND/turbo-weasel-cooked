@@ -176,7 +176,7 @@ function FightScene(cfg,opts={}){
   for(const f of [S.p1,S.p2]){dropShadow(c,f.x,FGROUND+2,Math.max(16,34-(FGROUND-f.y)*.08),.4);}
   // draw fighters (hurt one drawn last)
   const order=[S.p1,S.p2].sort((a,b)=>(a.state==='hurt'||a.state==='knockdown')?1:-1);
-  for(const f of order){const o={filter:f.inv>0&&Math.floor(G.time*20)%2?'brightness(2)':f.phase===2?'hue-rotate(260deg) saturate(1.6)':f.armor?'sepia(.6) saturate(2)':f.id==='plague'?'hue-rotate(80deg) saturate(.45) brightness(.72)':f.id==='lucifer'?'hue-rotate(-35deg) saturate(.6) brightness(.9)':undefined};drawFighter(c,f.id,pose(f),f.x,f.y,f.dir,o);if(f.id==='plague')drawPlagueMask(c,f);
+  for(const f of order){const o={filter:f.inv>0&&Math.floor(G.time*20)%2?'brightness(2)':f.armor?'sepia(.6) saturate(2)':undefined};drawFighter(c,f.id==='robbie'&&f.phase===2?'rockdj':f.id,pose(f),f.x,f.y,f.dir,o);
    if(f.state==='attack'&&f.move&&f.t>=f.move.start&&f.t<f.move.start+f.move.active&&f.move.name!=='special'){c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=3;c.beginPath();c.arc(f.x+f.dir*(f.move.range*.6),f.y-f.move.y,f.move.h*.5,0,7);c.stroke();}}
   for(const p of S.projs){c.save();c.translate(p.x,p.y);c.fillStyle=p.col;c.strokeStyle=INK;c.lineWidth=3;if(p.bottle){c.rotate(p.t*9);c.fillRect(-5,-14,10,28);c.strokeRect(-5,-14,10,28);c.fillStyle=PAPER;c.fillRect(-4,-4,8,8);c.restore();continue;}c.beginPath();const r=p.big?30:16;
    if(p.flame){const d=Math.sign(p.vx)||1;c.scale(d,1);for(let i=0;i<12;i++){const a=i/12*Math.PI*2,rr=(i%2?r*.5:r)*(1+Math.sin(p.t*30+i)*.25);c.lineTo(Math.cos(a)*rr*(Math.cos(a)<0?2.2:1.1),Math.sin(a)*rr);}c.closePath();c.fill();c.stroke();c.fillStyle='#ffd04a';c.beginPath();c.arc(4,0,r*.45,0,7);c.fill();}
@@ -209,12 +209,6 @@ function FightScene(cfg,opts={}){
   text(c,'PLAGUE RESPONSE',0,-30,{size:11,col:PAPER,align:'center',base:'middle'});
   if(S.jeep.lit){const t=S.jeep.t;c.globalCompositeOperation='lighter';for(let i=0;i<9;i++){const fx=-70+i*17.5,fh=40+Math.sin(t*14+i*1.7)*16+(i%3)*10;const g=c.createLinearGradient(0,-58,0,-58-fh);g.addColorStop(0,'rgba(255,220,80,.95)');g.addColorStop(.5,'rgba(255,120,20,.8)');g.addColorStop(1,'rgba(255,40,0,0)');c.fillStyle=g;c.beginPath();c.moveTo(fx-12,-58);c.quadraticCurveTo(fx-10,-58-fh*.6,fx+Math.sin(t*9+i)*6,-58-fh);c.quadraticCurveTo(fx+12,-58-fh*.6,fx+12,-58);c.closePath();c.fill();}
    c.globalCompositeOperation='source-over';c.fillStyle='rgba(255,140,40,.25)';c.beginPath();c.arc(0,-70,120+Math.sin(t*20)*8,0,7);c.fill();}
-  c.restore();}
- // Beak mask, goggles and brim drawn over the hazmat sheet so the Plague Doctor reads at a glance.
- function drawPlagueMask(c,f){const ps=pose(f);if(ps===14)return;const th=ATLAS.fight.plague.targetHeight;const hy=f.y-(ps===3?th*.62:th)+24;const hx=f.x+f.dir*6;c.save();c.translate(hx,hy);c.scale(f.dir,1);
-  c.fillStyle=INK;c.fillRect(-26,-22,52,8);c.fillRect(-16,-40,32,20);// hat
-  c.fillStyle='#2b2520';c.beginPath();c.moveTo(-10,-6);c.lineTo(34,6);c.lineTo(-6,16);c.closePath();c.fill();c.strokeStyle=INK;c.lineWidth=3;c.stroke();// beak
-  c.fillStyle='#1a1a1a';c.beginPath();c.arc(-6,-8,8,0,7);c.arc(8,-6,8,0,7);c.fill();c.fillStyle=f.state==='attack'?'#ff7a1a':'#9fe8d8';c.beginPath();c.arc(-6,-8,5,0,7);c.arc(8,-6,5,0,7);c.fill();// goggles
   c.restore();}
  function drawFightHUD(c){
   const bar=(x,f,flip)=>{const w=360-(flip?(G.hudR||0):0);c.fillStyle=INK;c.fillRect(x-4,30,w+8,30);c.fillStyle='#3a1a1a';c.fillRect(x,34,w,22);const p=clamp(f.hp/f.maxHp,0,1);const fw=w*p;c.fillStyle=p>.5?'#f7d96a':p>.25?AMBER:RED;c.fillRect(flip?x+w-fw:x,34,fw,22);

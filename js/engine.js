@@ -21,7 +21,7 @@ const chance=p=>Math.random()<p;
 function seeded(seed){let s=seed>>>0||1;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
 
 /* ---------- assets ---------- */
-const SPRITE_FILES={heroes:'heroes-v2.webp',enemies:'enemies-v2.webp',environments:'environments-v2.webp',expansion:'expansion-v3.webp',crew:'crew-v1.webp'};
+const SPRITE_FILES={riders:'gp-riders.webp',landmarks:'gp-landmarks.webp',courseProps:'gp-props.webp',heroes:'heroes-v2.webp',enemies:'enemies-v2.webp',environments:'environments-v2.webp',expansion:'expansion-v3.webp',crew:'crew-v1.webp'};
 function loadImage(src){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('load '+src));i.src=src;});}
 async function loadSprites(progress){
  const files={...SPRITE_FILES};
