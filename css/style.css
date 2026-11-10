@@ -57,3 +57,7 @@ body.touch.portrait #tpause{top:calc(max(3vh,env(safe-area-inset-top)) + 14vmin)
 #fshelp .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 #fshelp button{font:700 clamp(13px,3.4vmin,18px) 'Barlow Condensed',sans-serif;letter-spacing:1px;padding:10px 14px;border:2px solid #efba56;background:#efba56;color:#1d1613;border-radius:8px}
 #fshelp #fsclose{background:transparent;color:#efba56}
+
+#tinteract{position:absolute;left:50%;bottom:12vh;transform:translateX(-50%);padding:8px 18px;border:2px solid #17242b;border-radius:8px;background:#efba56;color:#17242b;font:20px Boogaloo,sans-serif;pointer-events:auto;display:none}
+body.near-npc #tinteract{display:block}
+@media(prefers-reduced-motion:reduce){#rotate .phone{animation:none}}

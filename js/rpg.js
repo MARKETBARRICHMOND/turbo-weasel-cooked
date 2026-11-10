@@ -24,7 +24,7 @@ function ResultsScene(res,run,chapter,opts={}){
  const xpGain=Math.round(((res.xp||0)+(res.bonusXp||0)+(res.fightWin?120:0)+chapter.n*40)*diff.xp);
  const cashGain=(res.cash||0)+(res.bonusCash||0)+(res.fightWin?150:0);
  S.rows=[['ENEMIES FLOGGED',res.kills||0],['SCORE',res.score||0],['DEEDS BANKED',res.deeds||0],['CRIMES COMMITTED',res.crimes||0],['BONUS ROUND','$'+(res.bonusCash||0)],...(res.race?[['GRAND PRIX',['1ST','2ND','3RD'][res.race-1]||res.race+'TH']]:[]),...(res.unlocked&&res.unlocked.length?[['SCRAP MODE',res.unlocked.join(' + ')+' UNLOCKED']]:[]),['BOSS',res.fightWin?(chapter.friendly?'HUGGED IT OUT':'FLATTENED'):'N/A'],['CASH','$'+cashGain],['XP','+'+xpGain]];
- S.enter=function(){Audio.playTrack('win');P.cash+=cashGain;P.deeds+=res.deeds||0;P.crimes+=res.crimes||0;P.kills+=res.kills||0;P.score+=res.score||0;S.ups=addXP(P,xpGain);};
+ S.enter=function(){if(S.applied)return;S.applied=true;Audio.playTrack('win');P.cash+=cashGain;P.deeds+=res.deeds||0;P.crimes+=res.crimes||0;P.kills+=res.kills||0;P.score+=res.score||0;S.ups=addXP(P,xpGain);save();};
  S.update=function(dt){if(S.done)return;S.t+=dt;updateFx();
   if(S.shown<S.rows.length&&S.t>.3+S.shown*.28){S.shown++;Audio.sfx('tick');if(S.shown===S.rows.length)Audio.sfx('cash');}
   if(S.shown>=S.rows.length){S.barT=Math.min(1,S.barT+dt*.8);}
@@ -37,7 +37,7 @@ function ResultsScene(res,run,chapter,opts={}){
   // ledger paper
   c.save();c.translate(70,130);c.rotate(-.015);c.fillStyle=INK;c.fillRect(6,6,400,330);c.fillStyle=PAPER;c.fillRect(0,0,400,330);c.strokeStyle=INK;c.lineWidth=3;c.strokeRect(0,0,400,330);
   text(c,'CRIME-CREDIT LEDGER',200,30,{size:26,font:FONT_TITLE,col:INK,align:'center',base:'middle',weight:'400'});c.fillStyle=INK;c.fillRect(20,48,360,2);
-  for(let i=0;i<S.shown;i++){const [k,v]=S.rows[i];text(c,k,24,80+i*30,{size:19,font:FONT_HAND,col:INK,weight:'400'});text(c,String(v),376,80+i*30,{size:21,font:FONT_HAND,col:i===3?RED:i===2?GREEN:INK,align:'right',weight:'400'});}
+  for(let i=0;i<S.shown;i++){const [k,v]=S.rows[i];text(c,k,24,66+i*Math.min(26,230/S.rows.length),{size:16,font:FONT_HAND,col:INK,weight:'400'});text(c,String(v),376,66+i*Math.min(26,230/S.rows.length),{size:16,font:FONT_HAND,col:i===3?RED:i===2?GREEN:INK,align:'right',weight:'400'});}
   if(S.shown>=S.rows.length){const net=P.deeds-P.crimes;const vd=VERDICTS.find(v=>v[0](net))[1];c.save();c.translate(200,300);c.rotate(-.08);text(c,'NET '+(net>=0?'+':'')+net,0,-10,{size:34,font:FONT_TITLE,col:net>=0?GREEN:RED,align:'center',base:'middle',weight:'400',stroke:3,strokeCol:PAPER});c.restore();}
   c.restore();
   if(S.shown>=S.rows.length){const net=P.deeds-P.crimes;const vd=VERDICTS.find(v=>v[0](net))[1];wrapText(c,vd,380,`400 20px ${FONT_HAND}`).forEach((l,i)=>text(c,l,700,470+i*24,{size:20,font:FONT_HAND,col:PAPER,align:'center',base:'middle',weight:'400'}));}

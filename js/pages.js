@@ -4,3 +4,5 @@ const PAGE_FILES={"I01-P01": "I01-P01.webp", "I01-P02": "I01-P02.webp", "I01-P04
 for (const name of ['sale','parts','scooter','grid','beak','jeep','triangle','drain','moon-grid','riot','riot-after','gazz','gazz-fight','vip','spar']) {
   PAGE_FILES['extra-' + name] = 'extra-' + name + '.webp';
 }
+
+Object.assign(PAGE_FILES, {"modern-couch": "modern-couch.webp", "modern-bar": "modern-bar.webp", "modern-tea": "modern-tea.webp", "modern-tyre": "modern-tyre.webp"});

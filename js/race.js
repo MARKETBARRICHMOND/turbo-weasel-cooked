@@ -38,7 +38,7 @@ function RaceScene(cfg,opts={}){
  const racers=[player,...ai];racers.slice().sort((p,q)=>q.total-p.total).forEach((r,i)=>r.place=i+1);const top0=maxV*1.9;const items=segs.filter(s=>s.item).map(s=>({z:s.i*SEG+SEG/2,x:0,taken:0}));
  const gears=segs.filter((s,i)=>i%23===11).map((s,i)=>({z:s.i*SEG+SEG/2,x:(i%3-1)*.55,taken:0}));
  const GEARQUIPS=SPACE?['SPACE GEAR!','GREEN AS, BROTHER','FUEL, AMMO, SMOKO','CURRENCY OF THE COSMOS','SUCK IT UP, BROTHER']:['GEAR!','CLIP SEAL CHRISTMAS','SHARDS OF GLORY','OFF YA CHOPS','YEAH THE BOYS'];
- const S={t:0,done:false,onDone:opts.onDone,phase:'count',phaseT:0,count:3,msgs:[],hazards:[],results:null,endT:0,cash:0,xp:0,__p:player,bg:0,pitch:0,lapT:0,best:0,smoke:[],assist:true,paused:false};
+ const S={t:0,done:false,onDone:opts.onDone,phase:'count',phaseT:0,count:3,msgs:[],hazards:[],results:null,endT:0,cash:0,xp:0,__p:player,bg:0,pitch:0,lapT:0,best:0,smoke:[],skids:[],assist:true,paused:false};
  S.autoPause=function(){if(S.phase==='race')S.paused=true;};
  const ITEMS=['cone','slab','bong','battery'];
  const msg=(txt,col=AMBER,size=48,life=1)=>S.msgs.push({txt,col,size,t:0,life});
@@ -55,26 +55,31 @@ function RaceScene(cfg,opts={}){
   const seg=segAt(r.z),next=segAt(r.z+SEG);const base=r.human?maxV:maxV0;const top=base*(r.gear>0?1.9:r.boost>0?1.35:1)*(r.ai?r.skill*(1+(r.band||0)):1);
   if(r.spin>0){r.spin-=dt;r.v=Math.max(0,r.v-2400*dt);r.x+=r.spinDir*dt*.5;r.steer=0;}
   else{let steer=0,gas=false,brake=false;
-   if(r.human){steer=(Input.held('right')?1:0)-(Input.held('left')?1:0);gas=Input.held('attack')||Input.held('jump')||Input.held('up');brake=Input.held('down');if(Input.hit('special'))useItem(r);if(gas||brake)S.assist=false;if(S.assist)gas=true;}
+   if(r.human){steer=Input.axisX||((Input.held('right')?1:0)-(Input.held('left')?1:0));gas=Input.held('attack')||Input.held('jump')||Input.held('up');brake=Input.held('down');if(Input.hit('special'))useItem(r);if(gas||brake)S.assist=false;if(S.assist)gas=true;}
    else{// AI: inside line, brake into sharp bends, dodge hazards, rubber-band to the player
     const ahead=segAt(r.z+SEG*6);const want=clamp(-ahead.curve*.2+Math.sin(S.t*.7+r.wob)*.3,-.8,.8);steer=clamp((want-r.x)*3.5,-1,1);gas=true;
     const far=segAt(r.z+SEG*9);brake=Math.abs(far.curve)>3.4&&r.v>top*.86;
     for(const h of S.hazards)if(h.z>r.z&&h.z-r.z<SEG*5&&Math.abs(h.x-r.x)<.3)steer=h.x>r.x?-1:1;
     if(r.item&&Math.random()<.01)useItem(r);
     const gap=player.total-r.total;r.band=clamp(gap/(SEG*40),-.16,.16);}
-   r.steer=lerp(r.steer,steer,.25);
+   r.steer=damp(r.steer,steer,11,dt);
    const g=r.human?1+up.grip*.08:1;const off=Math.abs(r.x)>1.02;const sp=r.v/base;
    // throttle: hard off the line, tapering toward top speed; coasting bleeds speed; brakes bite
-   let a=gas?(r.human?accel:accel0)*(1.3-Math.min(1.2,r.v/top)):brake?(r.ai?-1300:-2600):-380;
+   let a=brake?(r.ai?-1300:-2600):gas?(r.human?accel:accel0)*(1.3-Math.min(1.2,r.v/top)):-380;
    if(off){a-=900;if(r.v>base*.45)a-=(r.v-base*.45)*2.5;}
    r.v=clamp(r.v+a*dt,0,top);
    r.v-=(next.y-seg.y)*.5*dt;// hills
    // steering gets twitchier with speed; bends throw you out with the square of speed
-   r.x+=steer*dt*2.2*Math.min(1,sp+.3);
-   r.x-=seg.curve*dt*sp*sp*.78/g;
+   const steeringRate=SPACE?2.0:2.15;
+   r.x+=r.steer*dt*steeringRate*Math.min(1,sp+.3);
+   const drift=brake&&Math.abs(steer)>.35&&sp>.45;
+   r.x-=seg.curve*dt*sp*sp*(SPACE?.58:.64)/g;
+   // Grip reduces the extra lateral slip during a drift.
+   if(drift)r.x+=r.steer*dt*.35/g;
    // power slide: hard lock at speed
-   r.slide=(Math.abs(steer)>.5&&sp>.7)?Math.min(1,r.slide+dt*4):Math.max(0,r.slide-dt*3);
-   if(r.slide>0){r.x+=steer*dt*.8*r.slide;r.v-=r.v*.05*r.slide*dt;if(r.human&&G.frame%4===0)S.smoke.push({z:r.z,x:r.x-steer*.12,t:0});}
+   r.slide=((Math.abs(steer)>.65&&sp>.72)||drift)?Math.min(1,r.slide+dt*4):Math.max(0,r.slide-dt*3);
+   if(r.slide>0){r.x+=steer*dt*.8*r.slide;r.v-=r.v*.05*r.slide*dt;if(r.human&&G.frame%4===0)S.smoke.push({z:r.z,x:r.x-steer*.12,t:0});
+    if(r.human&&G.frame%3===0)S.skids.push({z:r.z,x:r.x,t:0});}
    if(off&&r.human&&Math.floor(S.t*10)%2===0)shake(1.2);
    if(off&&seg.scen&&Math.sign(r.x)===seg.scen.side&&Math.abs(r.x)>seg.scen.dist-.4&&r.v>maxV*.2&&(r.human||Math.abs(r.x)>1.4))crash(r);
    r.x=clamp(r.x,-2.3,2.3);}
@@ -86,19 +91,22 @@ function RaceScene(cfg,opts={}){
   for(const h of S.hazards){if(h.owner===r&&(h.t<.4||h.kind==='slab'))continue;const dz=((h.z-r.z)%LEN+LEN)%LEN;const near=Math.min(dz,LEN-dz);if(near<SEG*.6&&Math.abs(h.x-r.x)<.35&&r.spin<=0){r.spin=h.kind==='bong'?1.1:.8;r.spinDir=Math.random()<.5?-1:1;h.dead=h.kind==='slab';if(r.human){Audio.sfx('hurt');rword(h.kind==='bong'?'COUGHING':'OOF',W/2,H*.45,RED,48);shake(5);}}}
  }
  function finish(){S.phase='done';S.phaseT=0;const place=player.place;const pot=[320,180,110,60,40,30,20][place-1]||20;const mul=diff===DIFF.absolutely?1.6:diff===DIFF.cooked?1.3:1;S.cash=Math.round(pot*mul);S.xp=Math.round((place===1?90:place<=3?50:25)*diff.xp);Audio.sfx(place===1?'win':'lose');msg(place===1?'WINNER WINNER':place<=3?'PODIUM':'GOT SMOKED',place===1?'#f7d96a':PAPER,64,3);if(place===1&&cfg.track==='richmond')SAVE.eggs.gp=true;}
- S.update=function(dt){if(S.done)return;S.t+=dt;S.phaseT+=dt;updateFx();for(const m of S.msgs)m.t+=dt;S.msgs=S.msgs.filter(m=>m.t<m.life);for(const it of items)if(it.taken>0)it.taken-=dt;for(const gb of gears)if(gb.taken>0)gb.taken-=dt;
+ S.update=function(dt){if(S.done)return;
+  if(Input.hit('pause')&&S.phase==='race')S.paused=!S.paused;
+  if(S.paused){if(S.pauseAct==='resume'){S.paused=false;S.pauseAct=null;}else if(S.pauseAct==='quit'||Input.hit('back')){S.done=true;S.onDone({result:'quit',cash:0,xp:0});}return;}
+  S.t+=dt;S.phaseT+=dt;updateFx();for(const m of S.msgs)m.t+=dt;S.msgs=S.msgs.filter(m=>m.t<m.life);for(const it of items)if(it.taken>0)it.taken-=dt;for(const gb of gears)if(gb.taken>0)gb.taken-=dt;
   for(const h of S.hazards){h.t+=dt;if(h.kind==='slab')h.z+=h.v*dt;}S.hazards=S.hazards.filter(h=>!h.dead&&h.t<(h.kind==='bong'?9:4));
   for(const s of S.smoke)s.t+=dt;S.smoke=S.smoke.filter(s=>s.t<1.1);if(S.wordT>0)S.wordT-=dt;
-  if(Input.hit('pause')&&S.phase==='race'){S.paused=!S.paused;}if(S.paused){if(Input.hit('back')){S.done=true;S.onDone({result:'quit',cash:0,xp:0});}return;}
   if(S.phase==='count'){if(S.phaseT>1){S.phaseT=0;S.count--;Audio.sfx('tick');if(S.count<=0){S.phase='race';msg('GO YA MONGRELS','#98ef87',70,.9);Audio.sfx('round');}}return;}
   if(S.phase==='race')S.lapT+=dt;
+  for(const skid of S.skids)skid.t+=dt;S.skids=S.skids.filter(skid=>skid.t<5);
+  if(S.phase==='done'){if(S.phaseT>1.5&&(Input.hit('confirm')||Input.hit('attack')||Input.hit('jump')||Input.hit('click'))){S.done=true;S.onDone({result:'win',place:player.place,cash:S.cash,xp:S.xp});}return;}
   for(const r of racers)stepRacer(r,dt);
   // racer-vs-racer bumps: the faster one eats the hit and gets shoved sideways
   for(const a of racers)for(const b of racers){if(a===b)continue;const dz=b.z-a.z;if(dz>-SEG*.2&&dz<SEG*.5&&Math.abs(a.x-b.x)<.3&&a.v>b.v&&!(a.bumpT>0)){const side=a.x>b.x?1:-1;a.bumpT=.45;a.v=Math.max(b.v*.9,a.v*.6);a.x+=side*.28;b.x-=side*.1;b.v=Math.min(top0,b.v+a.v*.08);if(a.human){Audio.sfx('block');shake(3);rword(pick(['BUMP','OI!','WATCH IT']),W/2+side*120,H*.5,PAPER,26,true);}}}
   const order=racers.slice().sort((p,q)=>q.total-p.total);order.forEach((r,i)=>{if(!r.finished)r.place=i+1;});
   // camera feel: background pans through bends, horizon pitches with the hills
-  {const seg=segAt(player.z);const nx=segAt(player.z+SEG);S.bg+=seg.curve*(player.v/maxV)*dt*120+player.v*dt*.004;S.pitch=lerp(S.pitch,clamp((nx.y-seg.y)*.9,-40,40),.1);}
-  if(S.phase==='done'){if(S.phaseT>3.2&&(Input.hit('confirm')||Input.hit('attack')||Input.hit('jump')||Input.hit('click'))){S.done=true;S.onDone({result:'win',place:player.place,cash:S.cash,xp:S.xp});}}
+  {const seg=segAt(player.z);const nx=segAt(player.z+SEG);S.bg+=seg.curve*(player.v/maxV)*dt*120+player.v*dt*.004;S.pitch=damp(S.pitch,clamp((nx.y-seg.y)*.9,-40,40),7,dt);}
  };
  // ---------- drawing ----------
  const PANO={street:0,space:1,isa:2,moon:3};const YS=[0,335,634,916,1254],GROUNDS=[288,590,873,1183];
@@ -121,7 +129,13 @@ function RaceScene(cfg,opts={}){
    tree:[0,410], bin:[1,175], crowd:[2,335], pole:[3,510],
    rock:[4,155], crater:[5,230], fans:[6,320], antenna:[7,450]
  };
- function drawProp(c, kind, x, y, scale) {
+ function drawProp(c, kind, x, y, scale, side) {
+   if(kind==='crowd'||kind==='fans'){
+     const sector=Math.floor(player.z/LEN*6);const count=G.settings.crowds==='low'?2:4;
+     for(let person=0;person<count;person++){const cell=((sector*5+person*7)%24+24)%24;
+       drawCitizen(c,SPACE,cell,x+(person-(count-1)/2)*scale*66,y,scale*(130+person%2*15),{time:S.t,dir:-(side||1)});}
+     return;
+   }
    if (kind === 'tram' || kind === 'dome') {
      const size = scale * (kind === 'tram' ? 530 : 360);
      drawAtlasCell(c, G.img.landmarks, 4, 3, kind === 'tram' ? 2 : 7, x, y, size, size);
@@ -135,7 +149,7 @@ function RaceScene(cfg,opts={}){
   const camZ=player.z-SEG*2.2;const base=segAt(camZ),nextB=segAt(camZ+SEG);const basePct=((camZ%SEG)+SEG)%SEG/SEG;const camY=CAMH+lerp(base.y,nextB.y,basePct);const hor=HOR+S.pitch;
   // sky + distant skyline panning through the bends
   drawSky(c,T.sky,hor+40,S.t);
-  drawPanorama(c,T.pano,S.bg,{groundY:hor+6,parallax:1});c.fillStyle=SPACE?'rgba(10,4,8,.3)':'rgba(30,20,16,.22)';c.fillRect(0,0,W,hor+6);
+  if(G.img.districts){const cell=SPACE?[6,4,5,6,5,4][Math.floor(segAt(player.z).i/N*6)]:[1,0,0,1,3,0][Math.floor(segAt(player.z).i/N*6)];drawDistrict(c,cell,.5+Math.sin(S.bg*.001)*.35,hor+6);}else drawPanorama(c,T.pano,S.bg,{groundY:hor+6,parallax:1});c.fillStyle=SPACE?'rgba(10,4,8,.3)':'rgba(30,20,16,.22)';c.fillRect(0,0,W,hor+6);
   c.fillStyle=T.grass[0];c.fillRect(0,hor,W,H-hor);
   // road, near to far
   let maxy=H;const start=Math.floor(camZ/SEG);const frames=[];
@@ -152,6 +166,8 @@ function RaceScene(cfg,opts={}){
    const hw1=p1.w/2,hw2=p2.w/2;
    quad(hw1*1.07,hw2*1.07,T.edge[k]);// rumble strips
    quad(hw1,hw2,T.road[k]);// bitumen
+   if(!SPACE){quad(hw1*.004,hw2*.004,'#989b9b',hw1*.55,hw2*.55);quad(hw1*.004,hw2*.004,'#989b9b',-hw1*.55,-hw2*.55);}
+   const texture=(seg.i*37)%7;if(texture===0)quad(hw1*.008,hw2*.008,'rgba(0,0,0,.16)',hw1*.72,hw2*.7);
    if(k===0){quad(hw1*.012,hw2*.012,T.lane,hw1*.34,hw2*.34);quad(hw1*.012,hw2*.012,T.lane,-hw1*.34,-hw2*.34);}// lane dashes
    if(seg.i===0){c.fillStyle='rgba(255,255,255,.9)';for(let i=0;i<12;i++)if(i%2)c.fillRect(p1.x-hw1+p1.w*i/12,p2.y,p1.w/12,Math.max(2,rows));}
    // fog with distance
@@ -165,6 +181,7 @@ function RaceScene(cfg,opts={}){
    for(const it of items){if(it.taken>0)continue;if(Math.floor(it.z/SEG)===seg.i){const px=p1.x+p1.w/2*it.x;const s=sc*8;c.save();c.translate(px,p1.y-s*14);c.scale(s,s);c.rotate(S.t*2);c.fillStyle='#f7d96a';c.fillRect(-10,-10,20,20);c.strokeStyle=INK;c.lineWidth=2;c.strokeRect(-10,-10,20,20);c.restore();text(c,'?',px,p1.y-s*14,{size:Math.max(8,s*16),font:FONT_TITLE_UI,weight:'400',col:INK,align:'center',base:'middle'});}}
    for(const gb of gears){if(gb.taken>0)continue;if(Math.floor(gb.z/SEG)===seg.i){const px=p1.x+p1.w/2*gb.x;const s=sc*6;c.save();c.translate(px,p1.y-s*10);c.scale(s,s);drawGearBag(c,SPACE,S.t);c.restore();}}
    for(const h of S.hazards){if(Math.floor(((h.z%LEN)+LEN)%LEN/SEG)===seg.i){const px=p1.x+p1.w/2*h.x;const s=sc*8;c.save();c.translate(px,p1.y);c.scale(s,s);if(h.kind==='bong'){c.fillStyle=`rgba(200,230,200,${.6-Math.min(.5,h.t*.05)})`;for(let q=0;q<4;q++){c.beginPath();c.arc(Math.sin(h.t*2+q)*12,-10-q*8-h.t*2,12+q*3,0,7);c.fill();}}else{c.fillStyle='#de755f';c.fillRect(-14,-12,28,14);c.fillStyle=PAPER;c.fillRect(-10,-9,20,4);}c.restore();}}
+   for(const skid of S.skids){if(Math.floor(((skid.z%LEN)+LEN)%LEN/SEG)===seg.i){const px=p1.x+p1.w/2*skid.x;c.fillStyle=SPACE?'rgba(35,5,30,.55)':'rgba(4,8,10,.5)';c.fillRect(px-sc*7,p1.y,sc*4,sc*26);}}
    for(const sm of S.smoke){if(Math.floor(((sm.z%LEN)+LEN)%LEN/SEG)===seg.i){const px=p1.x+p1.w/2*sm.x;const s=sc*8;c.fillStyle=`rgba(230,230,230,${.5*(1-sm.t)})`;c.beginPath();c.arc(px,p1.y-s*4-sm.t*20,s*(6+sm.t*14),0,7);c.fill();}}
    for(const r of racers){if(r.human)continue;const rz=((r.z%LEN)+LEN)%LEN;if(Math.floor(rz/SEG)===seg.i){const px=p1.x+p1.w/2*r.x;drawVehicle(c,r,px,p1.y,sc,false);}}
    c.restore();}
@@ -174,7 +191,12 @@ function RaceScene(cfg,opts={}){
   drawVehicle(c,player,W/2+player.steer*6,H*.86+bob,1.6/2.1,true);
   // speed lines at the edges when flat out
   if(sp>.8){c.strokeStyle=`rgba(244,230,202,${(sp-.8)*2})`;c.lineWidth=2;for(let i=0;i<8;i++){const y=hor+rnd(0,H-hor);const len=rnd(40,140)*(sp);c.beginPath();if(i%2){c.moveTo(0,y);c.lineTo(len,y+rnd(-4,4));}else{c.moveTo(W,y);c.lineTo(W-len,y+rnd(-4,4));}c.stroke();}}
-  colourGrade(c,SPACE?'moon':'street');
+  colourGrade(c,SPACE?'moon':'street');drawAtmosphere(c,SPACE?'moon':'street',S.t);
+  // Track progress and rider positions are independent of leaderboard order.
+  c.fillStyle='rgba(8,17,22,.82)';c.fillRect(W/2-142,66,284,26);
+  c.fillStyle='#53666c';c.fillRect(W/2-130,78,260,3);
+  for(let district=0;district<=6;district++){c.fillStyle=PAPER;c.fillRect(W/2-130+district/6*260,75,1,8);}
+  for(const racer of racers){const position=((racer.z%LEN)+LEN)%LEN/LEN;c.fillStyle=racer.human?AMBER:TEAL;c.beginPath();c.arc(W/2-130+position*260,79,racer.human?4:2,0,Math.PI*2);c.fill();}
   // HUD: Cruis'n style
   const place=player.place;const ord=['ST','ND','RD','TH','TH','TH','TH'][place-1]||'TH';
   c.fillStyle=INK;c.fillRect(14,14,150,74);text(c,place+ord,30,50,{size:52,font:FONT_TITLE_UI,weight:'400',col:place===1?'#f7d96a':PAPER,base:'middle'});text(c,`LAP ${Math.min(player.lap,T.laps)}/${T.laps}`,150,74,{size:14,col:PAPER,align:'right',base:'middle'});
@@ -185,14 +207,14 @@ function RaceScene(cfg,opts={}){
   {const k=clamp(sp/1.9,0,1);c.fillStyle='#3a3230';c.fillRect(SX+10,H-24,100,8);c.fillStyle=k>.8?RED:'#f7d96a';c.fillRect(SX+10,H-24,100*k,8);}
   const WR=W-(G.hudR||0);  c.fillStyle=INK;c.fillRect(WR-124,14,110,56);text(c,'ITEM · K',WR-69,28,{size:11,col:PAPER,align:'center',base:'middle'});text(c,player.item?player.item.toUpperCase():'—',WR-69,50,{size:20,font:FONT_TITLE,weight:'400',col:player.item?'#f7d96a':'#6a6058',align:'center',base:'middle'});
   text(c,districtAt(segAt(player.z).i)[0],W/2,H-14,{size:11,col:'rgba(244,230,202,.6)',align:'center',base:'middle'});
-  if(S.phase==='count'){text(c,S.count>0?String(S.count):'GO',W/2,H*.42,{size:150,font:FONT_TITLE,weight:'400',col:S.count>0?'#f7d96a':'#98ef87',align:'center',base:'middle',stroke:14});text(c,G.touch?'STICK STEERS · HOLD ATTACK FOR GAS · SPECIAL USES ITEM · STICK DOWN BRAKES':'← → STEER · HOLD J OR SPACE FOR GAS · K USES ITEM · ↓ BRAKES',W/2,H*.62,{size:16,col:PAPER,align:'center',base:'middle',stroke:3});text(c,SPACE?'GRAB THE GLOWING GREEN GEAR: CURRENCY, FUEL, AMMO, AND THE BOYS SMOKE IT':'GRAB THE CLIP-SEAL BAGS OF GEAR FOR SUPER SPEED · STAY ON THE ROAD OR EAT A POLE',W/2,H*.70,{size:15,col:SPACE?'#5dff5a':'#f7d96a',align:'center',base:'middle',stroke:3});}
+  if(S.phase==='count'){text(c,S.count>0?String(S.count):'GO',W/2,H*.42,{size:150,font:FONT_TITLE,weight:'400',col:S.count>0?'#f7d96a':'#98ef87',align:'center',base:'middle',stroke:14});text(c,G.touch?'STICK STEERS · HOLD ATTACK FOR GAS · SPECIAL USES ITEM · STICK DOWN BRAKES':'← → STEER · J / SPACE GAS · K ITEM · ↓ + STEER DRIFT',W/2,H*.62,{size:16,col:PAPER,align:'center',base:'middle',stroke:3});text(c,SPACE?'GRAB THE GLOWING GREEN GEAR: CURRENCY, FUEL, AMMO, AND THE BOYS SMOKE IT':'GRAB THE CLIP-SEAL BAGS OF GEAR FOR SUPER SPEED · STAY ON THE ROAD OR EAT A POLE',W/2,H*.70,{size:15,col:SPACE?'#5dff5a':'#f7d96a',align:'center',base:'middle',stroke:3});}
   for(const m of S.msgs){const k=m.t/m.life;c.save();c.globalAlpha=k>.8?(1-k)/.2:1;text(c,m.txt,W/2,H*.3,{size:m.size,font:FONT_TITLE,weight:'400',col:m.col,align:'center',base:'middle',stroke:8});c.restore();}
   drawFx(c,0);drawFloaters(c,0);
   if(S.phase==='done'){c.fillStyle='rgba(0,0,0,.6)';c.fillRect(0,H*.45,W,H*.55);text(c,`${player.place}${ord} PLACE · $${S.cash} · +${S.xp} XP`,W/2,H*.58,{size:34,font:FONT_TITLE_UI,weight:'400',col:'#f7d96a',align:'center',base:'middle',stroke:6});
    const q=S.finishQuote ||= player.place===1?pick(['Lucifer wants a rematch. And his scooter back.','The Gear Guy lost money on that. Lovely.','Stolen scooter, honest win.']):pick([(RACERS.find(r=>r.id===racers.find(v=>v.place===1)?.id)||RACERS[0]).quip,'Sunday’s a long week.','Weasel blames the tyres. The tyres are also stolen.']);text(c,q,W/2,H*.7,{size:20,font:FONT_HAND,weight:'400',col:PAPER,align:'center',base:'middle'});
    if(S.best)text(c,'BEST LAP '+fmt(S.best),W/2,H*.78,{size:16,col:'#f7d96a',align:'center',base:'middle'});
-   if(S.phaseT>3.2)text(c,'ATTACK TO CONTINUE',W/2,H*.88,{size:20,font:FONT_TITLE,weight:'400',col:AMBER,align:'center',base:'middle'});}
-  if(S.paused){c.fillStyle='rgba(0,0,0,.6)';c.fillRect(0,0,W,H);text(c,'PAUSED',W/2,H/2-30,{size:64,font:FONT_TITLE,weight:'400',col:'#f7d96a',align:'center',base:'middle',stroke:8});text(c,'ESC RESUME · BACKSPACE QUIT',W/2,H/2+30,{size:18,col:PAPER,align:'center',base:'middle'});}
+   if(S.phaseT>1.5)text(c,'ATTACK TO CONTINUE',W/2,H*.88,{size:20,font:FONT_TITLE,weight:'400',col:AMBER,align:'center',base:'middle'});}
+  if(S.paused)drawPauseMenu(c,S,'BRAKE + STEER TO DRIFT · LB TALKS IN THE STREET');
  };
  return S;
 }

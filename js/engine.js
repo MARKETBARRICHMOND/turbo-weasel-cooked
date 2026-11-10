@@ -8,11 +8,13 @@ const G={
  fx:[],words:[],floaters:[],
  img:{},pages:{},pageMeta:{},
  touch:false,reduced:false,
- settings:{sfx:.8,music:.7,shake:true,blood:true,subtitles:true},
+ settings:{sfx:.8,music:.7,shake:true,blood:true,subtitles:true,motion:true,detail:'auto',crowds:'full',keys:{}},
 };
 const hexA=(h,a)=>`rgba(${parseInt(h.slice(1,3),16)},${parseInt(h.slice(3,5),16)},${parseInt(h.slice(5,7),16)},${a})`;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lerp=(a,b,t)=>a+(b-a)*t;
+const damp=(a,b,rate,dt)=>lerp(a,b,1-Math.exp(-rate*dt));
+const approach=(value,target,amount)=>value<target?Math.min(target,value+amount):Math.max(target,value-amount);
 const ease=t=>t<.5?2*t*t:-1+(4-2*t)*t;
 const easeOut=t=>1-Math.pow(1-t,3);
 const rnd=(a=1,b)=>b===undefined?Math.random()*a:a+Math.random()*(b-a);
@@ -21,7 +23,7 @@ const chance=p=>Math.random()<p;
 function seeded(seed){let s=seed>>>0||1;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
 
 /* ---------- assets ---------- */
-const SPRITE_FILES={riders:'gp-riders.webp',landmarks:'gp-landmarks.webp',courseProps:'gp-props.webp',heroes:'heroes-v2.webp',enemies:'enemies-v2.webp',environments:'environments-v2.webp',expansion:'expansion-v3.webp',crew:'crew-v1.webp'};
+const SPRITE_FILES={opponents:'opponents-v2.webp',districtRichmond:'district-richmond-v2.webp',districtLennox:'district-lennox-v2.webp',districtMoon:'district-moon-v2.webp',districts:'districts-v2.webp',localNPCs:'locals-v2.webp',orbitalNPCs:'orbital-v2.webp',riders:'gp-riders.webp',landmarks:'gp-landmarks.webp',courseProps:'gp-props.webp',heroes:'heroes-v2.webp',enemies:'enemies-v2.webp',environments:'environments-v2.webp',expansion:'expansion-v3.webp',crew:'crew-v1.webp'};
 function loadImage(src){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('load '+src));i.src=src;});}
 async function loadSprites(progress){
  const files={...SPRITE_FILES};
@@ -41,12 +43,15 @@ function getPage(id){
 function preloadPages(ids){ids.forEach(getPage);}
 
 /* ---------- input ---------- */
-const KEYMAP={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'up',KeyW:'up',ArrowDown:'down',KeyS:'down',Space:'jump',KeyL:'jump',KeyZ:'jump',KeyJ:'attack',KeyX:'attack',KeyK:'special',KeyC:'special',Enter:'confirm',Escape:'pause',KeyP:'pause',Backspace:'back',KeyM:'mute',Tab:'menu'};
+const KEYMAP={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'up',KeyW:'up',ArrowDown:'down',KeyS:'down',Space:'jump',KeyL:'jump',KeyZ:'jump',KeyJ:'attack',KeyX:'attack',KeyK:'special',KeyC:'special',Enter:'confirm',Escape:'pause',KeyP:'pause',Backspace:'back',KeyM:'mute',Tab:'menu',KeyE:'interact'};
+function actionLabel(action){const code=Object.keys(G.settings.keys||{}).find(code=>G.settings.keys[code]===action)||Object.keys(KEYMAP).find(code=>KEYMAP[code]===action)||action;return code.replace('Key','').replace('Arrow','').replace('Space','SPACE').toUpperCase();}
+function inputAction(code){return Object.prototype.hasOwnProperty.call(G.settings.keys||{},code)?G.settings.keys[code]:KEYMAP[code];}
 const Input={
- down:{},pressed:{},released:{},axisX:0,axisY:0,typed:'',konami:0,history:[],
+ keyboard:new Set(),touchDown:{},down:{},pressed:{},released:{},axisX:0,axisY:0,typed:'',konami:0,history:[],
  init(){
   window.addEventListener('keydown',e=>{
-   if(e.repeat)return;const k=KEYMAP[e.code];
+   if(Input.rebinding){e.preventDefault();Input.rebinding(e.code);return;}
+   if(e.repeat)return;const k=inputAction(e.code);Input.keyboard.add(e.code);
    Input.typed=(Input.typed+e.key.toUpperCase()).slice(-12);
    const KON=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'];
    Input.konami=e.code===KON[Input.konami]?Input.konami+1:(e.code===KON[0]?1:0);
@@ -54,8 +59,8 @@ const Input={
    if(k){Input.down[k]=true;Input.pressed[k]=true;if(['jump','attack','special','up','down','left','right','confirm','pause','back','menu'].includes(k))e.preventDefault();}
    Input.any=true;
   });
-  window.addEventListener('keyup',e=>{const k=KEYMAP[e.code];if(k){Input.down[k]=false;Input.released[k]=true;}});
-  window.addEventListener('blur',()=>{for(const k in Input.down)Input.down[k]=false;});
+  window.addEventListener('keyup',e=>{Input.keyboard.delete(e.code);const k=inputAction(e.code);if(k){Input.down[k]=false;Input.released[k]=true;}});
+  window.addEventListener('blur',()=>{Input.keyboard.clear();Input.touchDown={};for(const k in Input.down)Input.down[k]=false;});
   // touch
   const touch=document.getElementById('touch');
   const isTouch=matchMedia('(pointer:coarse)').matches||'ontouchstart'in window&&navigator.maxTouchPoints>0;
@@ -75,29 +80,49 @@ const Input={
   ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>{if(!G.zoomed)e.preventDefault();}));
   if(window.visualViewport){const vv=window.visualViewport;const zc=()=>zoomCheck(vv.scale||1);vv.addEventListener('resize',zc);vv.addEventListener('scroll',zc);setTimeout(zc,500);}
   const stick=document.getElementById('stick'),knob=stick.querySelector('.knob');let sid=null,sc=null;
-  const stickMove=(x,y)=>{const r=stick.getBoundingClientRect();let dx=(x-(r.left+r.width/2))/(r.width/2),dy=(y-(r.top+r.height/2))/(r.height/2);const m=Math.hypot(dx,dy);if(m>1){dx/=m;dy/=m;}knob.style.transform=`translate(${dx*r.width*.3}px,${dy*r.height*.3}px)`;const L=dx<-.35,R=dx>.35,U=dy<-.5,D=dy>.5;for(const [k,v] of [['left',L],['right',R],['up',U],['down',D]]){if(v&&!Input.down[k])Input.pressed[k]=true;Input.down[k]=v;}};
+  const stickMove=(x,y)=>{const r=stick.getBoundingClientRect();let dx=(x-(r.left+r.width/2))/(r.width/2),dy=(y-(r.top+r.height/2))/(r.height/2);const m=Math.hypot(dx,dy);if(m>1){dx/=m;dy/=m;}knob.style.transform=`translate(${dx*r.width*.3}px,${dy*r.height*.3}px)`;const L=dx<-.35,R=dx>.35,U=dy<-.5,D=dy>.5;for(const [k,v] of [['left',L],['right',R],['up',U],['down',D]]){if(v&&!Input.down[k])Input.pressed[k]=true;Input.touchDown[k]=v;Input.down[k]=v;}};
   stick.addEventListener('pointerdown',e=>{sid=e.pointerId;stick.setPointerCapture(sid);stickMove(e.clientX,e.clientY);});
   stick.addEventListener('pointermove',e=>{if(e.pointerId===sid)stickMove(e.clientX,e.clientY);});
-  const stickEnd=e=>{if(e.pointerId===sid){sid=null;knob.style.transform='';['left','right','up','down'].forEach(k=>Input.down[k]=false);}};
+  const stickEnd=e=>{if(e.pointerId===sid){sid=null;knob.style.transform='';['left','right','up','down'].forEach(k=>{Input.touchDown[k]=false;Input.down[k]=false;});}};
   stick.addEventListener('pointerup',stickEnd);stick.addEventListener('pointercancel',stickEnd);
-  touch.querySelectorAll('button').forEach(b=>{const k=b.dataset.k;b.addEventListener('pointerdown',e=>{e.preventDefault();Input.down[k]=true;Input.pressed[k]=true;if(k==='jump'||k==='attack')Input.pressed.confirm=true;Input.any=true;});const up=()=>{Input.down[k]=false;Input.released[k]=true;};b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('pointerleave',up);});
+  touch.querySelectorAll('button').forEach(b=>{const k=b.dataset.k;b.addEventListener('pointerdown',e=>{e.preventDefault();Input.touchDown[k]=true;Input.down[k]=true;Input.pressed[k]=true;if(k==='jump'||k==='attack')Input.pressed.confirm=true;Input.any=true;});const up=()=>{Input.touchDown[k]=false;Input.down[k]=false;Input.released[k]=true;};b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('pointerleave',up);});
   // canvas clicks = confirm/advance
   G.canvas.addEventListener('pointerdown',e=>{if(!(G.scene&&G.scene.menu))Input.pressed.confirm=true;Input.pressed.click=true;Input.any=true;const r=G.canvas.getBoundingClientRect();Input.mx=(e.clientX-r.left)/r.width*W;Input.my=(e.clientY-r.top)/r.height*H;});
   G.canvas.addEventListener('pointermove',e=>{if(e.pointerType!=='touch')Input.moved=true;const r=G.canvas.getBoundingClientRect();Input.mx=(e.clientX-r.left)/r.width*W;Input.my=(e.clientY-r.top)/r.height*H;});
  },
  poll(){
-  const gp=navigator.getGamepads?navigator.getGamepads()[0]:null;
-  if(gp){const ax=gp.axes[0]||0,ay=gp.axes[1]||0;const map={left:ax<-.4||gp.buttons[14]?.pressed,right:ax>.4||gp.buttons[15]?.pressed,up:ay<-.5||gp.buttons[12]?.pressed,down:ay>.5||gp.buttons[13]?.pressed,jump:gp.buttons[0]?.pressed,attack:gp.buttons[2]?.pressed,special:gp.buttons[1]?.pressed||gp.buttons[3]?.pressed,pause:gp.buttons[9]?.pressed,back:gp.buttons[8]?.pressed||(gp.buttons[1]?.pressed&&!!(G.scene&&G.scene.menu)),confirm:gp.buttons[0]?.pressed};
-   for(const k in map){const v=!!map[k];if(v&&!Input.gp?.[k])Input.pressed[k]=true;if(!v&&Input.gp?.[k])Input.released[k]=true;}
-   Input.gp=map;for(const k in map)if(map[k])Input.down[k]=true;else if(Input.gpPrev?.[k])Input.down[k]=false;Input.gpPrev=map;}
+  const pads=navigator.getGamepads?Array.from(navigator.getGamepads()):[];
+  const gp=pads.find(p=>p&&p.connected!==false);
+  const map={};
+  Input.axisX=0;Input.axisY=0;
+  if(gp){
+   const ax=gp.axes[0]||0,ay=gp.axes[1]||0;
+   Input.axisX=Math.abs(ax)>.18?Math.sign(ax)*(Math.abs(ax)-.18)/.82:0;
+   Input.axisY=Math.abs(ay)>.18?Math.sign(ay)*(Math.abs(ay)-.18)/.82:0;
+   Object.assign(map,{left:ax<-.4||gp.buttons[14]?.pressed,right:ax>.4||gp.buttons[15]?.pressed,
+    up:ay<-.5||gp.buttons[12]?.pressed,down:ay>.5||gp.buttons[13]?.pressed,
+    jump:gp.buttons[0]?.pressed,attack:gp.buttons[2]?.pressed||gp.buttons[7]?.pressed,
+    special:gp.buttons[1]?.pressed||gp.buttons[3]?.pressed,pause:gp.buttons[9]?.pressed,
+    back:gp.buttons[8]?.pressed||(gp.buttons[1]?.pressed&&!!G.scene?.menu),
+    interact:gp.buttons[4]?.pressed,confirm:gp.buttons[0]?.pressed});
+  }
+  const merged={...Input.touchDown};
+  for(const code of Input.keyboard){const action=inputAction(code);if(action)merged[action]=true;}
+  for(const action in map)if(map[action])merged[action]=true;
+  for(const action of new Set([...Object.keys(Input.down),...Object.keys(merged)])){
+   const held=!!merged[action];
+   if(held&&!Input.down[action])Input.pressed[action]=true;
+   if(!held&&Input.down[action])Input.released[action]=true;
+  }
+  Input.gp=map;Input.down=merged;
  },
  flush(){Input.pressed=Input.carry||{};Input.carry=null;Input.released={};Input.moved=false;},
- hot(x,y,w,h){const inside=Input.mx>=x&&Input.mx<=x+w&&Input.my>=y&&Input.my<=y+h;return {hover:inside&&Input.moved,click:inside&&!!Input.pressed.click};},
+ hot(x,y,w,h){const inside=Input.mx>=x&&Input.mx<=x+w&&Input.my>=y&&Input.my<=y+h;return {hover:inside&&Input.moved&&!G.transition,click:inside&&!!Input.pressed.click&&!G.transition};},
  hit(k){return !!Input.pressed[k];},
  held(k){return !!Input.down[k];}
 };
 
-const SHARE_URL='https://marketbarrichmond.github.io/turbo-weasel-cooked/';// the full-fat hosted copy (GitHub Pages): fullscreen + Add to Home Screen work there
+const SHARE_URL=location.protocol==='file:'?'https://turbo-weasel-cooked-170.marketbarrichmond.chatgpt.site/':location.origin+location.pathname;// the full-fat hosted copy (GitHub Pages): fullscreen + Add to Home Screen work there
 function fsHelp(){
  let d=document.getElementById('fshelp');if(d){d.hidden=false;return;}
  d=document.createElement('div');d.id='fshelp';
@@ -116,6 +141,7 @@ function zoomCheck(scale){const z=scale>1.04;if(z===!!G.zoomed)return;G.zoomed=z
 // how much of the canvas the phone's DOM buttons cover (canvas px): right column (pause/fullscreen), bottom (action buttons), left (stick). HUDs lean away from them.
 function measureTouchHud(){G.hudR=0;G.hudB=0;G.hudL=0;if(!G.touch||!G.canvas)return;try{const r=G.canvas.getBoundingClientRect();if(!r.width)return;const s=W/r.width;let left=Infinity,top=Infinity,right=-Infinity;['tpause','fsbtn'].forEach(id=>{const b=document.getElementById(id);if(!b)return;const q=b.getBoundingClientRect();if(q.width&&q.top<r.top+r.height*.4)left=Math.min(left,q.left);});document.querySelectorAll('#btns button').forEach(b=>{const q=b.getBoundingClientRect();if(q.width)top=Math.min(top,q.top);});const st=document.getElementById('stick');if(st){const q=st.getBoundingClientRect();if(q.width)right=q.right;}if(left<r.right)G.hudR=Math.ceil((r.right-left)*s)+8;if(top<r.bottom)G.hudB=Math.ceil((r.bottom-top)*s)+8;if(right>r.left)G.hudL=Math.ceil((right-r.left)*s)+8;}catch(e){}}
 function goFullscreen(popOut){
+ if(document.fullscreenElement||document.webkitFullscreenElement){const exit=document.exitFullscreen||document.webkitExitFullscreen;if(exit)exit.call(document);return;}
  const el=document.documentElement;const inFrame=window.self!==window.top;
  const lock=()=>{try{screen.orientation?.lock?.('landscape').catch(()=>{});}catch(e){}};
  const fail=()=>{if(!popOut)return;if(inFrame)fsHelp();else fsTip();};
@@ -265,7 +291,7 @@ function bubble(c,x,y,w,h,tx,ty,kind='speech',fill=PAPER){
  c.restore();
 }
 function halftone(c,x,y,w,h,col='rgba(0,0,0,.25)',step=6){c.save();c.fillStyle=col;for(let yy=y;yy<y+h;yy+=step)for(let xx=x+(((yy-y)/step)%2)*step/2;xx<x+w;xx+=step){c.beginPath();c.arc(xx,yy,1.2,0,Math.PI*2);c.fill();}c.restore();}
-function speedLines(c,cx,cy,n=40,alpha=.5,col=INK){c.save();c.globalAlpha=alpha;c.strokeStyle=col;c.lineWidth=2;for(let i=0;i<n;i++){const a=i/n*Math.PI*2+Math.sin(G.time+i)*.02,r0=rnd(180,260),r1=700;c.beginPath();c.moveTo(cx+Math.cos(a)*r0,cy+Math.sin(a)*r0);c.lineTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);c.stroke();}c.restore();}
+function speedLines(c,cx,cy,n=40,alpha=.5,col=INK){if(G.settings.motion===false)return;c.save();c.globalAlpha=alpha;c.strokeStyle=col;c.lineWidth=2;for(let i=0;i<n;i++){const a=i/n*Math.PI*2+Math.sin(G.time+i)*.02,r0=rnd(180,260),r1=700;c.beginPath();c.moveTo(cx+Math.cos(a)*r0,cy+Math.sin(a)*r0);c.lineTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);c.stroke();}c.restore();}
 function vignette(c,a=.55){const g=c.createRadialGradient(W/2,H/2,H*.45,W/2,H/2,H*.95);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${a})`);c.fillStyle=g;c.fillRect(0,0,W,H);}
 function drawCover(c,img,x,y,w,h){// cover-fit draw
  const s=Math.max(w/img.width,h/img.height),dw=img.width*s,dh=img.height*s;c.drawImage(img,x+(w-dw)/2,y+(h-dh)/2,dw,dh);}
@@ -327,6 +353,8 @@ function drawHero(c,type,x,y,o={}){
  const f=ATLAS.heroes[row*8+col];if(o.inv>0&&Math.floor(o.inv*14)%2===0)return;
  const s=.34*(o.scale||1);c.save();c.translate(Math.round(x),Math.round(y));c.scale(o.dir||1,1);
  if(o.tint){c.filter=o.tint;}
+ const squash=o.land?Math.sin(o.land*Math.PI/.16)*.1:0;c.scale(1+squash,1-squash);
+ if(!o.moving&&!o.air&&G.settings.motion!==false)c.translate(0,Math.sin(G.time*2)*.8);
  c.drawImage(img,f.x,f.y,f.w,f.h,Math.round(-f.anchor*s),Math.round(-f.h*s),Math.round(f.w*s),Math.round(f.h*s));c.restore();
 }
 // enemies-v2 by index; height in px
@@ -391,23 +419,25 @@ function writeSave(data){try{localStorage.setItem(SAVE_KEY,JSON.stringify(data))
 function boot(){
  if(document.fonts){["40px 'Turbo Weasel Tag'","40px 'Turbo Weasel Hand'","40px 'Bangers'","40px 'Patrick Hand'","40px 'Boogaloo'","800 20px 'Barlow Condensed'"].forEach(f=>document.fonts.load(f).catch(()=>{}));}
  G.canvas=document.getElementById('game');G.ctx=G.canvas.getContext('2d');
- const fitDPR=()=>{G.dpr=G.lowPerf?1:Math.min(2,window.devicePixelRatio||1);G.canvas.width=Math.round(W*G.dpr);G.canvas.height=Math.round(H*G.dpr);G.ctx.imageSmoothingEnabled=true;G.ctx.imageSmoothingQuality='high';};
- fitDPR();window.addEventListener('resize',fitDPR);
+ const fitDPR=()=>{const desired=G.canvas.getBoundingClientRect().width/W*(window.devicePixelRatio||1);G.dpr=G.settings.detail==='low'||G.lowPerf?1:Math.min(G.touch?2:3,Math.max(1,desired));G.canvas.width=Math.round(W*G.dpr);G.canvas.height=Math.round(H*G.dpr);G.ctx.imageSmoothingEnabled=true;G.ctx.imageSmoothingQuality='high';};
+ G.resize=fitDPR;fitDPR();window.addEventListener('resize',fitDPR);
  Input.init();Audio.init();
  let last=performance.now();
  function frame(now){
    requestAnimationFrame(frame);
-   const raw=(now-last)/1000;let dt=Math.min(.05,raw);last=now;Input.poll();
+   const raw=(now-last)/1000;G.frameMs=raw*1000;let dt=Math.min(.05,raw);last=now;Input.poll();
    if(G.hitstop>0){G.hitstop-=dt;dt=0;}
    G.dt=dt;G.time+=dt;G.frame++;
    if(G.next){G.scene=G.next;G.next=null;G.scene.enter&&G.scene.enter();Input.flush();}
    // phones: show the BACK button on menu screens only (in play, BACK would bail out of mini-games)
-   const ms=!!(G.scene&&G.scene.menu&&!G.scene.isTitle);if(ms!==G.menuDom){G.menuDom=ms;document.body.classList.toggle('menuscene',ms);}
+   const ms=!!(G.scene&&G.scene.menu&&!G.scene.isTitle);document.body.classList.toggle('near-npc',!!G.scene?.nearNPC&&!G.scene?.paused);
+   if(ms!==G.menuDom){G.menuDom=ms;document.body.classList.toggle('menuscene',ms);}
    if(G.touch&&G.frame%120===0)measureTouchHud();
+   if(G.frame%30===0){const sc=G.scene;G.canvas.dataset.scene=sc?.isTitle?'title':sc?.chapter?.id||sc?.phase||(sc?.ready===false?'loading':'menu');G.canvas.dataset.progress=String(sc?.p??'');}
    const t0=performance.now();
    const c=G.ctx;c.setTransform(G.dpr,0,0,G.dpr,0,0);c.save();
    if(G.shake>0){G.shake=Math.max(0,G.shake-dt*30);c.translate(rnd(-G.shake,G.shake),rnd(-G.shake,G.shake));}
-   if(G.scene){G.scene.update&&G.scene.update(dt);G.scene.draw&&G.scene.draw(c);}
+   if(G.scene){if(!G.transition)G.scene.update&&G.scene.update(dt);G.scene.draw&&G.scene.draw(c);}
    drawWords(c);
    c.restore();
    if(G.flash>0){c.fillStyle=G.flashCol;c.globalAlpha=G.flash;c.fillRect(0,0,W,H);c.globalAlpha=1;G.flash-=dt*3;}
@@ -415,8 +445,8 @@ function boot(){
    Input.flush();Input.any=false;
    // adaptive resolution: if a weak GPU can't hold the Retina canvas, drop to 1x after a few seconds.
    // A steady 30Hz screen (low-power mode, 30Hz display) is NOT a weak GPU: only drop when the frame gaps are ragged or the draw itself is heavy.
-   if(G.dpr>1&&!G.lowPerf&&now>6000){const work=performance.now()-t0;G.perfAcc=(G.perfAcc||0)+(raw>.028?1:0);G.perfSteady=(G.perfSteady||0)+(Math.abs(raw-1/30)<.004?1:0);G.perfHeavy=(G.perfHeavy||0)+(work>12?1:0);G.perfN=(G.perfN||0)+1;
-   if(G.perfN>=60){if(G.perfAcc>36&&(G.perfSteady<40||G.perfHeavy>30)){G.lowPerf=true;G.canvas.width=W;G.canvas.height=H;G.dpr=1;G.ctx.imageSmoothingEnabled=true;console.warn('Cooked Edition: dropped to 1x rendering for frame rate');}G.perfN=0;G.perfAcc=0;G.perfSteady=0;G.perfHeavy=0;}}
+   if(G.dpr>1&&!G.lowPerf&&G.settings.detail!=='high'&&now>6000){const work=performance.now()-t0;G.perfAcc=(G.perfAcc||0)+(raw>.028?1:0);G.perfSteady=(G.perfSteady||0)+(Math.abs(raw-1/30)<.004?1:0);G.perfHeavy=(G.perfHeavy||0)+(work>12?1:0);G.perfN=(G.perfN||0)+1;
+   if(G.perfN>=60){if(G.perfAcc>36&&G.perfHeavy>30){G.lowPerf=true;G.dpr=G.touch?1:1.5;G.canvas.width=Math.round(W*G.dpr);G.canvas.height=Math.round(H*G.dpr);G.ctx.imageSmoothingEnabled=true;console.warn('Cooked Edition: adjusted rendering resolution for frame rate');}G.perfN=0;G.perfAcc=0;G.perfSteady=0;G.perfHeavy=0;}}
  }
  requestAnimationFrame(frame);
 }

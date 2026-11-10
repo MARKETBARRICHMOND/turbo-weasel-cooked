@@ -4,6 +4,11 @@ Owner: Keean Alavi. Repository: MARKETBARRICHMOND/turbo-weasel-cooked. The relea
 
 ## Current work
 
+Keean approved a major modern desktop upgrade on 11 November 2026. v2.0.0 implements the desktop UI, new populations and district art, optional comic scenes, movement and racing improvements. Read its README release section before changing anything. The current playable host is https://turbo-weasel-cooked-170.marketbarrichmond.chatgpt.site/ . The hostname retains 170, while the in-game version identifies the release. GitHub remains the code source of truth. The prior GitHub Pages upload timed out while syncing files, so always check that host against the release before directing Keean there.
+
+The current priority is desktop keyboard/controller play, with landscape touch compatibility. The approved Lennox-to-GP sample is available under TRY THE UPGRADE. It creates an in-memory temporary save and restores the campaign on exit. `save()` intentionally excludes that temporary state. Four optional conversations have dedicated illustrated pages and return to the same scene. New character inventories and all creative additions are in README.md.
+
+
 Keean approved v1.7.0 on 7 November 2026. The approved scope covers both Scooter GP tracks, visual variety, the nine-chapter adaptation of the ten-issue Robbie Williams arc, distinctive hero and boss art, and dedicated comic panels for game-only encounters. Implementation and the creative extras are documented under v1.7.0 in README.md. The original 0.6.1 Build 20261020 lives separately in Keean’s Claude project. Never overwrite or delete it.
 
 The v1.7.0 chapter table in README.md maps the adaptation. Game art was checked against the comic pages shipped here, the supplied handoff and recovered enhanced-edition dialogue drafts and visual inventory. The final Mac story bible was unavailable in the development environment. Compare any future plot change against the owner’s canon folder. The bike is sold to cover the gear debt. The game interlude explains Lucifer withholding payment over three parts, settling with the dealer and supplying a stolen Ninebot.
@@ -13,7 +18,7 @@ The v1.7.0 chapter table in README.md maps the adaptation. Game art was checked 
 - Adult, NSFW, dark Australian humour. Keep the Richmond grit, swearing, bong and gear references. Preserve the canon cast, places, plot and names (Freddo, Carl). New filler characters are welcome when they serve the comic. No custom player characters.
 - Gear comes in clip-seal bags of white/clear crystals. Space gear glows green and functions as currency, recreational smoke, spaceship fuel and ammunition.
 - Lucifer is a tiny Arab bloke in a black singlet and jeans. The dealer lives across the road. Lucifer’s workshop is the top flat at 106 Lennox Street. Space racing uses ragtag, improvised karts.
-- Design for phones in landscape. Aim for sharp 90s arcade action or the feel of playing the comic. Bonus rounds should be simple. Easy modes should be accessible and hard modes brutal.
+- Design for desktop first and preserve landscape touch play. Aim for sharp 90s arcade action or the feel of playing the comic. Bonus rounds should be simple. Easy modes should be accessible and hard modes brutal.
 - Use Boogaloo for speech and menus, Bangers for HUD numbers, and Turbo Weasel Tag for impact lettering: logos, chapter titles, Scrap Mode and fight calls. Keep the retired handwriting face out of ordinary text.
 - Illustrate new story material with matching comic panels. Keep the principal characters recognisable and avoid reusing another boss’s skin.
 - Keean supplies the music. Sound samples are parked. Show the brief before major new work. For each release bump the version, list fixes and every creative extra in README.md for veto, push main and check Pages.
@@ -32,6 +37,6 @@ Use transitionTo for scene changes with a wipe/page turn. Guard completion callb
 
 ## Continue on the owner’s Mac
 
-Use a fresh checkout in a development folder and open that folder as a local Codex project. The iCloud backup of older builds is separate. Comic references on the Mac are under Documents/ChatGPT/TURBO AND WEASEL/TURBO_AND_WEASEL_MASTER, particularly 01_CANON_AND_STORY_BIBLE, 02_COMIC_SCRIPTS/Robbie_Williams_Arc and 04_VISUAL_DEVELOPMENT/VISUAL_STYLE_BIBLE.md.
+Open the repository in a development folder. Use the owner-supplied story bible, comic scripts and visual references when making future canon changes.
 
-The first local QA task is a physical iPhone Safari landscape playtest: clear Lennox, verify its comic-to-GP transition, race both courses with touch controls, check cornering legibility and HUD coverage, and inspect the Plague Doctor, Trixy and Rock DJ scenes. Headless Chromium checks at 844×390 and 667×375 exercised the two races through payouts, scene rendering, image loading and save persistence. A full unaided campaign playthrough and physical iPhone testing remain open. Keep any owner changes made after this handoff.
+Remaining device QA includes measured 1080p/1440p desktop performance and physical controller input. Also run a physical iPhone Safari landscape playtest: clear Lennox, verify its comic-to-GP transition, race both courses with touch controls, check cornering legibility and HUD coverage, and inspect the Plague Doctor, Trixy and Rock DJ scenes. Headless Chromium checks at 844×390 and 667×375 exercised the two races through payouts, scene rendering, image loading and save persistence. A full unaided campaign playthrough and physical iPhone testing remain open. Keep any owner changes made after this handoff.

@@ -59,7 +59,7 @@ function ComicScene(beats,opts={}){
    if(!S.from)S.from=target;
    S.to=target;const k=ease(S.moveT);
    const fr={x:lerp(S.from.x,S.to.x,k),y:lerp(S.from.y,S.to.y,k),w:lerp(S.from.w,S.to.w,k),h:lerp(S.from.h,S.to.h,k)};
-   const drift=1+.035*Math.sin(S.t*.4);
+   const drift=G.settings.motion===false?1:1+.015*Math.sin(S.t*.4);
    const scale=Math.min(W/fr.w,H/fr.h)*.96*drift;const dw=fr.w*scale,dh=fr.h*scale;const dx=(W-dw)/2,dy=(H-dh)/2;
    // ink paper border behind page
    c.fillStyle='#0d0a08';c.fillRect(0,0,W,H);
@@ -70,7 +70,7 @@ function ComicScene(beats,opts={}){
    c.drawImage(img,fr.x,fr.y,fr.w,fr.h,dx,dy,dw,dh);
    c.restore();
    c.lineWidth=6;c.strokeStyle=INK;c.strokeRect(dx-8,dy-8,dw+16,dh+16);
-   if(S.moveT<1){c.globalAlpha=(1-S.moveT)*.25;speedLines(c,W/2,H/2,24,1,PAPER);c.globalAlpha=1;}
+   if(S.moveT<1&&G.settings.motion!==false){c.globalAlpha=(1-S.moveT)*.25;speedLines(c,W/2,H/2,24,1,PAPER);c.globalAlpha=1;}
    S.lastPageRect={dx,dy,dw,dh};
   }else{
    text(c,'LOADING PAGE…',W/2,H/2,{size:28,font:FONT_TITLE,align:'center',base:'middle',col:PAPER,weight:'400'});
@@ -88,6 +88,7 @@ function ComicScene(beats,opts={}){
   });
   // page turn flash
   if(S.pageTurn>0){c.fillStyle=PAPER;c.globalAlpha=S.pageTurn*.9;c.fillRect(0,0,W,H);c.globalAlpha=1;}
+  text(c,b.page.startsWith('modern-')||b.page.startsWith('extra-')?'GAME INTERLUDE':b.page.replace(/^I0?/,'ISSUE ').replace('-P',' · PAGE '),16,20,{size:12,font:FONT_COMIC,weight:'400',col:TEAL,stroke:3});
   // UI hints
   text(c,S.allowSkip?'ENTER / TAP: NEXT   ·   HOLD SPECIAL: SKIP SCENE':'ENTER / TAP: NEXT',W-16,H-12,{size:14,align:'right',col:'rgba(244,230,202,.7)'});
   if(S.chapter)text(c,`ISSUE ${S.chapter.issue} · ${S.chapter.title}`,16,H-12,{size:14,col:'rgba(244,230,202,.7)'});

@@ -15,6 +15,7 @@ Works on a phone or iPad too (touch stick + buttons appear automatically). Gamep
 | Jump (Weasel: double jump, wall kick) | Space / Z / L | A |
 | Attack / shoot | J / X | X |
 | Special (Bull Rush / System Hack) | K / C | B or Y |
+| Talk to a local | E | LB |
 | Confirm / next panel | Enter, or tap/click | A |
 | Pause | Esc / P | Start |
 | Skip a cutscene | Hold Special | Hold B |
@@ -221,3 +222,50 @@ Scooter GP now has rear-view rider art for both heroes and every opponent. The M
 Additional artwork includes the Moon starting-grid panel, twelve roadside landmarks, eight scenery sprites including spectator groups, gum trees, bins and lunar telemetry, the sixteen mounted rider/vehicle combinations, separate eight-pose sheets for Lucifer and Plague Doctor mapped to the existing fight moves, and a sixteen-pose Rock DJ sheet. Turbo and Weasel have distinct scooter and kart stances that lean through turns. Chapter backgrounds use illustrated landmarks at fixed positions. The comic camera starts each new page from that page’s own framing.
 
 The new panels use the supplied handoff and existing comic art as references. The recovered dialogue and visual inventory were used as adaptation references.
+
+## v2.0.0 (11 Nov 2026)
+
+The desktop upgrade keeps the nine-chapter adaptation and adds a larger illustrated cast, new districts, optional comic conversations and revised controls. The working play link is https://turbo-weasel-cooked-170.marketbarrichmond.chatgpt.site/ . The URL retains its original name and serves the current release. The GitHub Pages deployment status must be checked separately.
+
+| Area | v1.7.0 | v2.0.0 |
+|---|---|---|
+| Street and space populations | Repeated spectator groups and the original enemy pool | 24 individually illustrated Richmond residents, 24 orbital residents, and eight additional opponent designs with idle and attack poses |
+| Environments | Panorama strips and roadside landmark panels | Eight illustrated districts, with larger individual Richmond, Lennox and lunar scenes, textured awnings and gantries, and ambient particles |
+| Movement | Immediate horizontal speed changes and coyote time | Acceleration and braking, buffered jumps, retained wall-kick momentum, landing compression and frame-rate-independent camera smoothing |
+| Racing | Digital steering, gas taking priority over brake | Analog steering, smoother leaning, brake priority, controlled drifts, tyre marks, tram rails, individual spectators and a race-position ribbon |
+| Desktop menus | Comic cover layout with fixed keys | New title, character and difficulty screens, display controls, crowd density, motion setting and keyboard remapping |
+| Optional story | Existing campaign interludes | Four illustrated local conversations that return to the same level and unlock their page in the Gallery |
+| Trying new content | Campaign unlocks | TRY THE UPGRADE offers Lennox through the race, either GP course, or Market Bar on a temporary character |
+
+### Controls and progression
+
+E talks to a nearby local. On a gamepad use LB. The touch version shows TALK when a local is close. Default movement and combat keys remain listed above. SETTINGS → CONTROLS remaps movement, jump, attack, special and talk. Escape, P, Enter, Tab and M retain their navigation/system roles. Tab changes settings pages. A gamepad can use Y to change the settings page, A to choose and B to return. Keyboard and gamepad inputs can coexist. RT also attacks or accelerates.
+
+SETTINGS → DISPLAY & SOUND offers AUTO, HIGH and LOW detail, FULL or LOW crowds, ambient motion, screen shake, music and SFX. Desktop resolution follows the canvas display size up to 3× logical resolution. AUTO can reduce resolution after sustained costly rendering. LOW uses 1× rendering. The main level camera shows more of the street on desktop. Phones retain the closer framing.
+
+XP progress is visible during levels. Results bank rewards once per results instance and the longer race ledger fits its panel. Seen chapter introductions are skipped on replay. New-game progression still starts with a fresh profile. TRY THE UPGRADE restores the previous campaign when the sample ends or is quit, and its temporary progress is excluded from persistent saves. Existing `tw_cooked_save_v1` and `tw_cooked_settings` keys are retained.
+
+### Creative additions for veto
+
+The new Richmond cast contains a punk, grocer, council worker, bar worker, skater, older regular, door worker, student, mechanic, driver, footy patron, wheelchair-using goth, magpie regular, cook, courier, metalhead, denim-clad local, shopper, couch mover, tracksuit regular, pokies patron, busker, angler and dog walker. The orbital cast contains a welder, cleaner, mechanic, merchant, bar droid, pit marshal, customs officer, porter, astronaut, gambler, boar bouncer, punk pit worker, crystal cashier, owl pilot, diner, robot postie, snail engineer, coral bartender, older spacer, insect tourist, sweeper, axolotl tyre worker, alien metalhead and kettle mechanic. Residents breathe, duck when combat is close and have small ambient motions. Each resident uses a single illustrated pose.
+
+Eight opponent designs add a bald brawler, tartan punk, helmeted biker, tracksuit gunner, dock enforcer, insect pirate, rock miner and security droid. Each has a separate attack pose. Their existing enemy-type stats and collision contracts are retained.
+
+Four optional conversations have new corresponding panels. They add local humour around the established chapter route.
+
+| Chapter | New optional comic scene |
+|---|---|
+| Market Bar Mayhem | A bar worker tells Weasel that the clean-up has mostly redistributed the mess. |
+| Lennox Street Repo | The couch mover has been stuck on the landing since Tuesday and calls it a furnished landing. |
+| Welcome to the Real Shithole | A bar droid offers ordinary tea and gets tired of Turbo’s suspicion. |
+| Blood Moon, Last Drinks | An axolotl mechanic explains that the old tyre went into orbit. |
+
+The new district drawings cover Victoria Street, the Lennox workshop, the night laneway, the servo, Dock 69, the ISA concourse, the lunar pub/pits and Robbie’s bridge. They are game illustrations guided by the supplied handoff and shipped comic pages. The final Mac story bible was unavailable. The bike sale, dealer payment, return for Bork, Robbie’s accounts and bridge escape follow the existing chapter sequence.
+
+Artwork was produced with the built-in image generator and packed into WebP atlases. Source bounds are in `js/npc-frames.js`. Rendering, population and optional dialogue are in `js/modern-world.js`. Desktop presentation and remapping are in `js/modern-ui.js`. The original heroes, named bosses, music and existing comic pages remain the references for the cast and story.
+
+### Verification
+
+`node tests/desktop.cjs` checks 72 chapter/hero/difficulty combinations, required-pickup placement, both opponent poses, mouse menu entry, remapping, jump buffering, short jumps, wall-kick momentum, landing across a platform at 30 Hz, movement distance at 30/60/120 Hz, keyboard/pad coexistence and disconnect, race braking, frozen pause time, both races through payout, one completion callback, test-drive save isolation, optional-comic return and shipped story page IDs. JavaScript syntax and Git whitespace checks also pass.
+
+The browser smoke check covers the title, test-drive menu and Lennox street composition. Full unaided campaign completion, physical controller input and measured 1080p/1440p performance remain hardware acceptance checks. The automated tests use the real scene logic with a mocked drawing surface. They do not establish desktop frame rate or certify every visual layout.
